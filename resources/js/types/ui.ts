@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react';
-import type { BreadcrumbItem } from './navigation';
 
 export type AppLayoutProps = {
     children: ReactNode;
-    breadcrumbs?: BreadcrumbItem[];
 };
 
 export type AuthLayoutProps = {
@@ -11,4 +9,16 @@ export type AuthLayoutProps = {
     name?: string;
     title?: string;
     description?: string;
+};
+
+export type AppShellProps = {
+    children: ReactNode;
+    variant?: 'default' | 'sidebar';
+    className?: string;
+};
+
+export type AppContentProps = {
+    children: ReactNode;
+    variant?: 'default' | 'sidebar';
+    className?: string;
 };

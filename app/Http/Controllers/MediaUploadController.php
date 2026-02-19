@@ -11,7 +11,7 @@ final class MediaUploadController extends Controller
     public function upload(Request $request): RedirectResponse
     {
         $request->validate([
-            'files.*' => 'required|image|max:512000',
+            'files.*' => 'required|image',
         ]);
 
         $uploadedFiles = [];
@@ -23,7 +23,7 @@ final class MediaUploadController extends Controller
                 'id' => uniqid(),
                 'name' => $file->getClientOriginalName(),
                 'path' => $path,
-                'url' => Storage::disk('public')->url($path),
+                'url' => Storage::url($path),
                 'size' => $file->getSize(),
             ];
         }

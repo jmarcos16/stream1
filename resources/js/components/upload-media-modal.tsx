@@ -9,20 +9,9 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import type { UploadedFile, UploadMediaModalProps } from '@/types';
 
-interface UploadMediaModalProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-}
-
-interface UploadedFile {
-    id: string;
-    file: File;
-    preview: string;
-    progress: number;
-}
-
-export default function UploadMediaModal({ open, onOpenChange }: UploadMediaModalProps) {
+export default function UploadMediaModal({ open, onOpenChange, onUploadSuccess }: UploadMediaModalProps) {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -68,7 +57,12 @@ export default function UploadMediaModal({ open, onOpenChange }: UploadMediaModa
         });
 
         router.post('/media/upload', formData, {
-            onSuccess: () => {
+            onSuccess: (page: any) => {
+                console.log('Upload successful:', page);
+                const uploadedFilesData = page.props.uploadedFiles || [];
+                if (onUploadSuccess) {
+                    onUploadSuccess(uploadedFilesData);
+                }
                 setUploadedFiles([]);
                 onOpenChange(false);
             },
