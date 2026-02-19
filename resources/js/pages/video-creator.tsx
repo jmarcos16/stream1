@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Film, Upload, Mic, Subtitles } from 'lucide-react';
+import { Film, Mic, Subtitles } from 'lucide-react';
+import UploadMediaModal from '@/components/upload-media-modal';
 
 export default function VideoCreator() {
     const [aiVoiceover, setAiVoiceover] = useState(true);
     const [autoSubtitles, setAutoSubtitles] = useState(true);
     const [script, setScript] = useState('');
+    const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     return (
         <>
@@ -21,7 +23,6 @@ export default function VideoCreator() {
                     backgroundSize: '24px 24px'
                 }}
             >
-                {/* Header */}
                 <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#27272a] px-6 py-3 shrink-0 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-10">
                     <div className="flex items-center gap-4 text-white">
                         <div className="size-6">
@@ -39,43 +40,26 @@ export default function VideoCreator() {
                         </Avatar>
                     </div>
                 </header>
-
-                {/* Main Content */}
                 <main className="flex flex-1">
-                    {/* Sidebar */}
                     <aside className="w-96 flex flex-col border-r border-solid border-[#27272a] bg-[#09090b]">
-                        {/* Project Info */}
                         <div className="p-6 border-b border-solid border-[#27272a]">
                             <h1 className="text-white text-base font-medium leading-normal">Video Project</h1>
                             <p className="text-[#92b7c9] text-sm font-normal leading-normal">Untitled_Project_01</p>
                         </div>
 
-                        {/* Sidebar Content */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                            {/* 1. Upload Media */}
                             <div>
                                 <h3 className="text-sm font-medium text-[#92b7c9] mb-3 uppercase tracking-wider">
                                     1. Upload Media
                                 </h3>
-                                <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-[#27272a] bg-[#18181b]/50 px-6 py-8">
-                                    <Upload className="h-10 w-10 text-[#92b7c9]" />
-                                    <div className="flex max-w-[480px] flex-col items-center gap-1">
-                                        <p className="text-white text-base font-bold leading-tight tracking-[-0.015em] text-center">
-                                            Drag & Drop Media
-                                        </p>
-                                        <p className="text-[#92b7c9] text-sm font-normal leading-normal text-center">
-                                            Upload videos, images, or audio
-                                        </p>
-                                    </div>
-                                    <Button 
-                                        className="bg-white text-black hover:bg-white/90 shadow-sm"
-                                    >
-                                        Browse Files
-                                    </Button>
-                                </div>
+                                <Button
+                                    onClick={() => setUploadModalOpen(true)}
+                                    className="w-full bg-white text-black font-medium hover:bg-white/90"
+                                >
+                                    Upload Media
+                                </Button>
                             </div>
 
-                            {/* 2. Enter Script */}
                             <div>
                                 <h3 className="text-sm font-medium text-[#92b7c9] mb-3 uppercase tracking-wider">
                                     2. Enter Script
@@ -88,13 +72,11 @@ export default function VideoCreator() {
                                 />
                             </div>
 
-                            {/* 3. Settings */}
                             <div>
                                 <h3 className="text-sm font-medium text-[#92b7c9] mb-3 uppercase tracking-wider">
                                     3. Settings
                                 </h3>
                                 <div className="flex flex-col gap-1">
-                                    {/* AI Voiceover */}
                                     <div className="flex items-center gap-4 bg-transparent px-2 min-h-14 justify-between">
                                         <div className="flex items-center gap-4">
                                             <Mic className="h-5 w-5 text-white" />
@@ -107,8 +89,6 @@ export default function VideoCreator() {
                                             onCheckedChange={setAiVoiceover}
                                         />
                                     </div>
-
-                                    {/* Auto-subtitles */}
                                     <div className="flex items-center gap-4 bg-transparent px-2 min-h-14 justify-between">
                                         <div className="flex items-center gap-4">
                                             <Subtitles className="h-5 w-5 text-white" />
@@ -125,15 +105,15 @@ export default function VideoCreator() {
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="p-6 border-t border-solid border-[#27272a] space-y-3 shrink-0">
                             <Button 
                                 className="w-full bg-white text-black hover:bg-white/90 shadow-sm font-semibold"
                             >
                                 Generate Video
                             </Button>
-                            <button 
-                                className="w-full text-center text-[#92b7c9] text-sm font-medium hover:text-white transition-colors"
+                            <Button
+                                variant="ghost"
+                                className="w-full text-[#92b7c9] hover:text-white hover:bg-white/10 font-medium"
                                 onClick={() => {
                                     setScript('');
                                     setAiVoiceover(true);
@@ -141,11 +121,10 @@ export default function VideoCreator() {
                                 }}
                             >
                                 Reset
-                            </button>
+                            </Button>
                         </div>
                     </aside>
 
-                    {/* Preview Area */}
                     <section className="flex flex-1 items-center justify-center p-10 overflow-y-auto">
                         <div className="text-center max-w-sm">
                             <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[#11181c] ring-1 ring-white/10">
@@ -160,6 +139,11 @@ export default function VideoCreator() {
                         </div>
                     </section>
                 </main>
+
+                <UploadMediaModal 
+                    open={uploadModalOpen}
+                    onOpenChange={setUploadModalOpen}
+                />
             </div>
         </>
     );

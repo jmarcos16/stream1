@@ -6,9 +6,7 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::get('/', function () {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
+    return redirect()->route('video-creator');
 })->name('home');
 
 Route::get('dashboard', function () {
@@ -16,7 +14,6 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('video-creator', VideoCreatorController::class)
-    ->middleware(['auth', 'verified'])
     ->name('video-creator');
 
 require __DIR__.'/settings.php';
