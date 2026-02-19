@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { router } from '@inertiajs/react';
 import { Upload, X, CloudUpload } from 'lucide-react';
 import {
     Dialog,
@@ -23,6 +24,7 @@ interface UploadedFile {
 
 export default function UploadMediaModal({ open, onOpenChange }: UploadMediaModalProps) {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -58,8 +60,25 @@ export default function UploadMediaModal({ open, onOpenChange }: UploadMediaModa
     };
 
     const handleUpload = () => {
-        // TODO: Implementar lógica de upload
-        console.log('Uploading files:', uploadedFiles);
+        setIsUploading(true);
+
+        const formData = new FormData();
+        uploadedFiles.forEach(file => {
+            formData.append('files[]', file.file);
+        });
+
+        router.post('/media/upload', formData, {
+            onSuccess: () => {
+                setUploadedFiles([]);
+                onOpenChange(false);
+            },
+            onError: (errors: Record<string, string>) => {
+                const errorMessage = Object.values(errors).join(', ') || 'Upload failed';
+            },
+            onFinish: () => {
+                setIsUploading(false);
+            },
+        });
     };
 
     return (
@@ -159,11 +178,11 @@ export default function UploadMediaModal({ open, onOpenChange }: UploadMediaModa
                         Cancel
                     </Button>
                     <Button
-                        disabled={uploadedFiles.length === 0}
+                        disabled={uploadedFiles.length === 0 || isUploading}
                         onClick={handleUpload}
                         className="bg-white text-black hover:bg-white/90 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Upload
+                        {isUploading ? 'Uploading...' : 'Upload'}
                     </Button>
                 </div>
             </DialogContent>

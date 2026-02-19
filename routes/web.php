@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\VideoCreatorController;
+use App\Http\Controllers\MediaUploadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -15,5 +16,8 @@ Route::get('dashboard', function () {
 
 Route::get('video-creator', VideoCreatorController::class)
     ->name('video-creator');
+
+Route::post('media/upload', [MediaUploadController::class, 'upload'])
+    ->name('media.upload');
 
 require __DIR__.'/settings.php';
