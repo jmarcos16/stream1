@@ -12,6 +12,12 @@ applyTo: '**'
 
 ## React - Boas Práticas
 
+### Types/TypeScript
+
+- **Sempre use types** - Todo componente React e hook deve ter tipos TypeScript explícitos para props, estados e retornos.
+- **Organize types em arquivos dedicados** - Types devem estar sempre em `resources/js/types/` em arquivos com nomes que façam sentido e reflitam seu domínio (ex: `auth.ts`, `ui.ts`, `navigation.ts`).
+- **Importe tipos dos arquivos organizados** - Não defina tipos inline; sempre importe de `resources/js/types/`.
+
 ### Componentes
 
 - **Use componentes funcionais com hooks** - Evite class components. Sempre use functional components.

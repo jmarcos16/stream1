@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { router } from '@inertiajs/react';
-import { Upload, X, CloudUpload } from 'lucide-react';
+import { Upload, CloudUpload } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -9,6 +9,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { ImageList } from '@/components/image-list';
 import type { UploadedFile, UploadMediaModalProps } from '@/types';
 
 export default function UploadMediaModal({ open, onOpenChange, onUploadSuccess }: UploadMediaModalProps) {
@@ -125,42 +126,12 @@ export default function UploadMediaModal({ open, onOpenChange, onUploadSuccess }
                         </p>
                     </div>
 
-                    {/* Uploaded Files List */}
-                    {uploadedFiles.length > 0 && (
-                        <div>
-                            <h3 className="text-white text-sm font-bold uppercase tracking-tight mb-3">
-                                Selected Files ({uploadedFiles.length})
-                            </h3>
-                            <div className="space-y-2">
-                                {uploadedFiles.map(file => (
-                                    <div
-                                        key={file.id}
-                                        className="flex items-center justify-between p-3 rounded-lg border border-[#27272a] bg-[#18181b]/50 hover:bg-[#27272a]/50 transition-colors"
-                                    >
-                                        <img
-                                            src={file.preview}
-                                            alt={file.file.name}
-                                            className="h-12 w-12 rounded object-cover shrink-0"
-                                        />
-                                        <div className="flex-1 min-w-0 ml-3">
-                                            <p className="text-white text-sm truncate">{file.file.name}</p>
-                                            <p className="text-[#92b7c9] text-xs">
-                                                {(file.file.size / 1024 / 1024).toFixed(2)} MB
-                                            </p>
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => removeFile(file.id)}
-                                            className="text-[#92b7c9] hover:text-white hover:bg-white/10 ml-2 shrink-0"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    {/* Selected Files List */}
+                    <ImageList
+                        items={uploadedFiles}
+                        onRemove={removeFile}
+                        title="Selected Files"
+                    />
                 </div>
 
                 <div className="border-t border-[#27272a] px-6 py-4 flex gap-3 justify-end">

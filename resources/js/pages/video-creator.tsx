@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Film, Mic, Subtitles, X } from 'lucide-react';
+import { Film, Mic, Subtitles } from 'lucide-react';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import UploadMediaModal from '@/components/upload-media-modal';
-import type { UploadedImage } from '@/types';
+import { ImageList } from '@/components/image-list';
+import type { UploadedImage } from '@/types/upload';
 
 export default function VideoCreator() {
     const [aiVoiceover, setAiVoiceover] = useState(true);
@@ -38,36 +39,17 @@ export default function VideoCreator() {
                                     Upload Media
                                 </Button>
 
-                                {uploadedImages.length > 0 && (
-                                    <div className="mt-4">
-                                        <p className="text-xs text-[#92b7c9] uppercase tracking-wider font-bold mb-3">
-                                            Uploaded Images ({uploadedImages.length})
-                                        </p>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {uploadedImages.map((image) => (
-                                                <div key={image.id} className="relative group">
-                                                    <img
-                                                        src={image.url}
-                                                        alt={image.name}
-                                                        className="w-full h-20 object-cover rounded-lg border border-[#27272a]"
-                                                    />
-                                                    <button
-                                                        onClick={() =>
-                                                            setUploadedImages(
-                                                                uploadedImages.filter(
-                                                                    (img) => img.id !== image.id,
-                                                                ),
-                                                            )
-                                                        }
-                                                        className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    >
-                                                        <X className="h-3 w-3 text-white" />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                <div className="mt-4">
+                                    <ImageList
+                                        items={uploadedImages}
+                                        onRemove={(id) =>
+                                            setUploadedImages(
+                                                uploadedImages.filter((img) => img.id !== id),
+                                            )
+                                        }
+                                        title="Uploaded Images"
+                                    />
+                                </div>
                             </div>
 
                             <div>
