@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { router } from '@inertiajs/react';
 import { Upload, CloudUpload } from 'lucide-react';
+import { toast } from "sonner"
 import {
     Dialog,
     DialogContent,
@@ -59,16 +60,17 @@ export default function UploadMediaModal({ open, onOpenChange, onUploadSuccess }
 
         router.post('/media/upload', formData, {
             onSuccess: (page: any) => {
-                console.log('Upload successful:', page);
                 const uploadedFilesData = page.props.uploadedFiles || [];
                 if (onUploadSuccess) {
                     onUploadSuccess(uploadedFilesData);
                 }
                 setUploadedFiles([]);
                 onOpenChange(false);
+                toast.success('Media uploaded successfully');
             },
             onError: (errors: Record<string, string>) => {
                 const errorMessage = Object.values(errors).join(', ') || 'Upload failed';
+                toast.error(errorMessage);
             },
             onFinish: () => {
                 setIsUploading(false);
