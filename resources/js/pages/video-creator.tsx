@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
+import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -8,13 +9,27 @@ import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import UploadMediaModal from '@/components/upload-media-modal';
 import { ImageList } from '@/components/image-list';
 import type { UploadedImage } from '@/types/upload';
+import { store } from '@/actions/App/Http/Controllers/VideoGenerationController';
 
 export default function VideoCreator() {
-    const [aiVoiceover, setAiVoiceover] = useState(true);
-    const [autoSubtitles, setAutoSubtitles] = useState(true);
-    const [script, setScript] = useState('');
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+
+    const form = useForm({
+        script: '',
+        aiVoiceover: true,
+        autoSubtitles: true,
+    });
+
+    const handleSubmit = (e: React.SubmitEvent) => {
+        e.preventDefault();
+        form.submit('post', store.url());
+    };
+
+    const handleReset = () => {
+        form.reset();
+        setUploadedImages([]);
+    };
 
     return (
         <>
@@ -27,7 +42,8 @@ export default function VideoCreator() {
                             <p className="text-[#92b7c9] text-sm font-normal leading-normal">Untitled_Project_01</p>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                        <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+                            <div className="flex-1 overflow-y-auto p-6 space-y-8">
                             <div>
                                 <h3 className="text-sm font-medium text-[#92b7c9] mb-3 uppercase tracking-wider">
                                     1. Upload Media
@@ -57,8 +73,8 @@ export default function VideoCreator() {
                                     2. Enter Script
                                 </h3>
                                 <Textarea
-                                    value={script}
-                                    onChange={(e) => setScript(e.target.value)}
+                                    value={form.data.script}
+                                    onChange={(e) => form.setData('script', e.target.value)}
                                     className="min-h-36 border-[#27272a] bg-[#18181b] text-white placeholder:text-zinc-500 focus-visible:ring-white"
                                     placeholder="Tell your story here. The AI will match your media to the script."
                                 />
@@ -77,8 +93,8 @@ export default function VideoCreator() {
                                             </p>
                                         </div>
                                         <Switch
-                                            checked={aiVoiceover}
-                                            onCheckedChange={setAiVoiceover}
+                                            checked={form.data.aiVoiceover}
+                                            onCheckedChange={(checked) => form.setData('aiVoiceover', checked)}
                                         />
                                     </div>
                                     <div className="flex items-center gap-4 bg-transparent px-2 min-h-14 justify-between">
@@ -89,30 +105,32 @@ export default function VideoCreator() {
                                             </p>
                                         </div>
                                         <Switch
-                                            checked={autoSubtitles}
-                                            onCheckedChange={setAutoSubtitles}
+                                            checked={form.data.autoSubtitles}
+                                            onCheckedChange={(checked) => form.setData('autoSubtitles', checked)}
                                         />
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            </div>
 
-                        <div className="p-6 border-t border-solid border-[#27272a] space-y-3 shrink-0">
-                            <Button className="w-full bg-white text-black hover:bg-white/90 shadow-sm font-semibold">
-                                Generate Video
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="w-full text-[#92b7c9] hover:text-white hover:bg-white/10 font-medium"
-                                onClick={() => {
-                                    setScript('');
-                                    setAiVoiceover(true);
-                                    setAutoSubtitles(true);
-                                }}
-                            >
-                                Reset
-                            </Button>
-                        </div>
+                            <div className="p-6 border-t border-solid border-[#27272a] space-y-3 shrink-0">
+                                <Button
+                                    type="submit"
+                                    disabled={form.processing}
+                                    className="w-full bg-white text-black hover:bg-white/90 shadow-sm font-semibold"
+                                >
+                                    {form.processing ? 'Generating...' : 'Generate Video'}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    className="w-full text-[#92b7c9] hover:text-white hover:bg-white/10 font-medium"
+                                    onClick={handleReset}
+                                >
+                                    Reset
+                                </Button>
+                            </div>
+                        </form>
                     </aside>
 
                     <section className="flex flex-1 items-center justify-center p-10 overflow-y-auto">

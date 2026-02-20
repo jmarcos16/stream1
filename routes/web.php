@@ -17,6 +17,9 @@ Route::get('dashboard', function () {
 Route::get('video-creator', VideoCreatorController::class)
     ->name('video-creator');
 
+Route::post('video/generate', [\App\Http\Controllers\VideoGenerationController::class, 'store'])
+    ->name('video.generate');
+
 Route::post('media/upload', [MediaUploadController::class, 'upload'])
     ->name('media.upload');
 
