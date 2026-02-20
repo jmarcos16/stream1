@@ -4,6 +4,11 @@ applyTo: '**'
 
 # Padrões de Código
 
+## Nomenclatura e Idioma
+
+- **Use termos em inglês** - Variáveis, funções, classes, constantes e identificadores devem ser nomeados em inglês.
+- **Exceção**: Comentários e documentação podem estar em português, mas nomes no código sempre em inglês.
+
 ## Comentários
 
 - **Proibido adicionar comentários no código** - O código deve ser auto-explicativo através de nomes descritivos de variáveis, funções e componentes.
@@ -55,3 +60,12 @@ applyTo: '**'
 - **Efeitos focados** - Cada `useEffect` deve ter uma única responsabilidade.
 - **Limpeza de efeitos** - Sempre limpe subscriptions, timeouts e listeners em `useEffect` return.
 - **Dependências corretas** - Array de dependências do `useEffect` deve incluir todas as variáveis externas usadas.
+
+## PHP - Boas Práticas
+
+### PHPDoc / PHPStan
+
+- **Siga as regras de docblock do PHPStan** - Sempre mantenha docblocks alinhados com as regras de análise estática do PHPStan.
+- Docblocks devem incluir tipos de parâmetros, tipos de retorno e exceções lançadas quando apropriado.
+- Comentários em docblocks devem estar em inglês.
+- Mantenha a documentação concisa e sem comentários redundantes inline no código.

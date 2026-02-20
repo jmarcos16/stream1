@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use FFMpeg\Filters\Video\VideoFilters;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -11,85 +12,79 @@ use function Laravel\Prompts\intro;
 
 class TesteVideoProcessor extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:teste';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Test video processor command';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         intro('TesteVideoProcessor Command');
-        
+
         $images = $this->getImages();
         if (empty($images)) {
             $this->error('No images found in the directory.');
             return;
         }
 
-        $outputDir = storage_path('app/videos/teste');
-        File::ensureDirectoryExists($outputDir);
+        $output = 'videos/raw_video.mp4';
 
-        $output = $outputDir . '/raw_video.mp4';
-
-        $this->buildVideoFromImages($images, $output);
+        $videoFiles = $this->buildVideoFromImages($images);
+        $this->concatenateVideos($videoFiles, $output);
         $this->info('Video processing completed successfully.');
     }
 
-    private function buildVideoFromImages(array $images, string $output): void
+    private function buildVideoFromImages(array $images): array
     {
-        $durantion = 5;
-        $fps = 30;
-        $tempDir = storage_path('app/videos/teste/temp');
-        File::ensureDirectoryExists($tempDir);
+        $duration = 5;
+        $tempDir  = 'videos/temp';
 
-        $videosFiles = [];
+        File::ensureDirectoryExists(storage_path('app/' . $tempDir));
+
+        $videoFiles = [];
+
         foreach ($images as $index => $image) {
-            $inputPath = storage_path('app/public/images/' . $image);
-            $tempVideoPath = $tempDir . '/video_' . $index . '.mp4';
+            $inputPath     = 'images/' . $image;
+            $tempVideoPath = $tempDir . '/clip_' . $index . '.mp4';
 
-            dd($inputPath, $tempVideoPath);
-            
-            FFMpeg::open($inputPath)
+            FFMpeg::fromDisk('public')
+                ->open($inputPath)
                 ->export()
                 ->toDisk('local')
-                ->inFormat(new X264('libx264', 'libx264'))
+                ->asTimelapseWithFramerate(1 / $duration)
+                ->inFormat((new X264)->setKiloBitrate(1000))
                 ->save($tempVideoPath);
 
-            $videosFiles[] = $tempVideoPath;
-        }
+            $videoFiles[] = $tempVideoPath;
 
-        FFMpeg::open($videosFiles)
+            $this->info("Clip {$index} criado: {$tempVideoPath}");
+        }
+        
+        return $videoFiles;
+    }
+
+    private function concatenateVideos(array $videoFiles, string $output): void
+    {
+        FFMpeg::fromDisk('local')
+            ->open($videoFiles)
             ->export()
             ->toDisk('local')
-            ->inFormat(new X264('libx264', 'libx264'))
+            ->inFormat((new X264)->setKiloBitrate(1000))
+            ->concatWithTranscoding(hasVideo: true, hasAudio: false)
             ->save($output);
 
-        File::deleteDirectory($tempDir);
+        $this->info("Vídeo final salvo em: {$output}");
     }
 
     private function getImages(): array
     {
         $imagesPath = storage_path('app/public/images');
-        
+
         if (!is_dir($imagesPath)) {
-            $this->error('Images directory does not exist.');
+            $this->error('Images directory does not exist: ' . $imagesPath);
             return [];
         }
 
-        $files = scandir($imagesPath);
-        $images = array_filter($files, function ($file) use ($imagesPath) {
+        $files  = scandir($imagesPath);
+        $images = array_filter($files, function ($file) {
             $extension = pathinfo($file, PATHINFO_EXTENSION);
             return in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
         });
