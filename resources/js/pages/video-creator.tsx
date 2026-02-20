@@ -9,7 +9,7 @@ import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import UploadMediaModal from '@/components/upload-media-modal';
 import { ImageList } from '@/components/image-list';
 import type { UploadedImage } from '@/types/upload';
-import { store } from '@/actions/App/Http/Controllers/VideoGenerationController';
+import { process } from '@/actions/App/Http/Controllers/VideoGenerationController';
 
 export default function VideoCreator() {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -23,7 +23,7 @@ export default function VideoCreator() {
 
     const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
-        form.submit('post', store.url());
+        form.submit('post', process.url());
     };
 
     const handleReset = () => {
