@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVideoProjectRequest;
+use App\Jobs\Video\BuildVideoJob;
+use App\Jobs\Video\GenerateAudioJob;
+use App\Jobs\Video\MergeAudioVideoJob;
+use App\Models\Video;
+use App\VideoStatus;
 use Illuminate\Support\Facades\Bus;
 
 final class VideoGenerationController extends Controller
@@ -11,18 +16,16 @@ final class VideoGenerationController extends Controller
     {
         $video = Video::query()->create([
             'script' => $request->input('script'),
-            'status' => 'pending',
+            'status' => VideoStatus::PENDING,
         ]);
 
         Bus::chain([
-            new GenerateAudioJob($video),
-            new GenerateTranscriptionJob($video),
+            // new GenerateAudioJob($video),
             new BuildVideoJob($video),
-            new MergeAudioVideoJob($video),
+            // new MergeAudioVideoJob($video),
         ])
-        ->onQueue('video-generation')
-        ->catch(function (Throwable $e) use ($video) {
-            $video->update(['status' => 'failed']);
+        ->catch(function (\Throwable $e) use ($video) {
+            $video->update(['status' => VideoStatus::FAILED]);
             // before implementing the broadcast event with reverb
         })
         ->dispatch();
