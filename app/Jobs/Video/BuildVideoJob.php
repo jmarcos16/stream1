@@ -7,9 +7,8 @@ use App\VideoStatus;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
-use FFMpeg\Format\Video\X264;
 use Illuminate\Support\Facades\File;
+use Symfony\Component\Process\Process;
 
 class BuildVideoJob implements ShouldQueue
 {
@@ -18,14 +17,23 @@ class BuildVideoJob implements ShouldQueue
     public int $tries = 3;
     public int $timeout = 300;
 
-    public function __construct(public Video $video) 
-    {
-        //
-    }
+    private const WIDTH = 1080;
+    private const HEIGHT = 1920;
+    private const FPS = 30;
+    private const CLIP_DURATION = 5;
+    private const TRANSITION_DURATION = 0.3;
 
-    /**
-     * Execute the job.
-     */
+    private const TRANSITIONS = [
+        'fade',
+        'slideup',
+        'slideleft',
+        'circleopen',
+        'dissolve',
+        'wiperight',
+    ];
+
+    public function __construct(public Video $video) { }
+
     public function handle(): void
     {
         $this->video->update(['status' => VideoStatus::PROCESSING]);
@@ -36,80 +44,181 @@ class BuildVideoJob implements ShouldQueue
             throw new Exception('No images found to build the video.');
         }
 
-        $outputDir = storage_path('app/videos/' . $this->video->id);
-        File::ensureDirectoryExists($outputDir);
+        $videoDir = storage_path('app/videos/' . $this->video->id);
+        File::ensureDirectoryExists($videoDir);
         
-        $output = $outputDir . '/raw_video.mp4';
+        $tempDir = storage_path('app/videos/temp/' . $this->video->id);
+        File::ensureDirectoryExists($tempDir);
+        
+        $output = $videoDir . '/raw_video.mp4';
 
-        $this->buildVideoFromImages($images, $output);
-        $this->video->update([
-            'status' => VideoStatus::COMPLETED,
-            'raw_video_path' => 'videos/' . $this->video->id . '/raw_video.mp4',
-        ]);
+        try {
+            $clips = $this->buildClips($images, $tempDir);
+
+            if (count($clips) < 2) {
+                $finalClip = $clips[0] ?? null;
+                if ($finalClip) {
+                    File::copy($finalClip, $output);
+                }
+            } else {
+                $this->concatenateWithTransitions($clips, $output);
+            }
+
+            $this->video->update([
+                'status' => VideoStatus::COMPLETED,
+                'raw_video_path' => 'videos/' . $this->video->id . '/raw_video.mp4',
+            ]);
+        } finally {
+            File::deleteDirectory($tempDir);
+        }
     }
 
+    /**
+     * @return list<string>
+     */
     private function getImages(): array
     {
         $imagesPath = storage_path('app/public/images');
-        
-        if (!File::isDirectory($imagesPath)) {
+
+        if (!is_dir($imagesPath)) {
             return [];
         }
 
-        $images = File::files($imagesPath);
+        $files = File::files($imagesPath);
         $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        
-        $imageFiles = array_filter($images, function ($file) use ($extensions) {
+
+        $imageFiles = array_filter($files, function ($file) use ($extensions) {
             return in_array(strtolower($file->getExtension()), $extensions);
         });
 
-        usort($imageFiles, function ($a, $b) {
-            return strcmp($a->getFilename(), $b->getFilename());
-        });
+        usort($imageFiles, fn ($a, $b) => strcmp($a->getFilename(), $b->getFilename()));
 
-        return array_map(fn ($file) => $file->getRealPath(), $imageFiles);
+        return array_values(array_map(fn ($file) => $file->getRealPath(), $imageFiles));
     }
 
-    private function buildVideoFromImages(array $images, string $output): void
+    /**
+     * @param list<string> $images
+     * @return list<string>
+     */
+    private function buildClips(array $images, string $tempDir): array
     {
-        $duration = 5;
-        $fps = 30;
-        $tempDir = storage_path('app/videos/temp/' . $this->video->id);
-        File::ensureDirectoryExists($tempDir);
+        $clips = [];
+        $effects = $this->getKenBurnsEffects();
 
-        $videoFiles = [];
-        
         foreach ($images as $index => $imagePath) {
-            $tempVideoPath = $tempDir . '/image_' . str_pad($index, 3, '0', STR_PAD_LEFT) . '.mp4';
-            
-            FFMpeg::open($imagePath)
-                ->addFilter('fps=' . $fps)
-                ->addFilter('pad=1920:1080:(ow-iw)/2:(oh-ih)/2')
-                ->export()
-                ->asX264()
-                ->withoutAudio()
-                ->onProgress(function ($progress) {})
-                ->toDisk('local')
-                ->save('videos/temp/' . $this->video->id . '/image_' . str_pad($index, 3, '0', STR_PAD_LEFT) . '.mp4');
+            $outputPath = $tempDir . '/clip_' . str_pad((string) $index, 3, '0', STR_PAD_LEFT) . '.mp4';
+            $effect = $effects[$index % count($effects)];
 
-            $videoFiles[] = $tempVideoPath;
+            $this->runFfmpeg([
+                'ffmpeg', '-y',
+                '-i', $imagePath,
+                '-vf', $this->buildFilterChain($effect),
+                '-c:v', 'libx264',
+                '-preset', 'medium',
+                '-crf', '18',
+                '-pix_fmt', 'yuv420p',
+                '-t', (string) self::CLIP_DURATION,
+                '-an',
+                $outputPath,
+            ]);
+
+            $clips[] = $outputPath;
         }
 
-        $this->concatenateVideos($videoFiles, $output);
-        File::deleteDirectory($tempDir);
+        return $clips;
     }
 
-    private function concatenateVideos(array $videoFiles, string $output): void
+    private function buildFilterChain(string $zoompanFilter): string
     {
-        $ffmpeg = FFMpeg::open($videoFiles[0]);
-        $concat = $ffmpeg->concat();
+        $w = self::WIDTH;
+        $h = self::HEIGHT;
+        $scaleW = $w * 2;
+        $scaleH = $h * 2;
 
-        foreach ($videoFiles as $videoPath) {
-            $concat->addSource(FFMpeg::open($videoPath));
+        return "scale={$scaleW}:{$scaleH}:force_original_aspect_ratio=increase,"
+             . "crop={$scaleW}:{$scaleH},"
+             . $zoompanFilter;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getKenBurnsEffects(): array
+    {
+        $d = self::CLIP_DURATION * self::FPS;
+        $w = self::WIDTH;
+        $h = self::HEIGHT;
+        $fps = self::FPS;
+
+        return [
+            "zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={$d}:s={$w}x{$h}:fps={$fps}",
+            "zoompan=z='if(eq(on,1),1.5,max(zoom-0.0015,1.0))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={$d}:s={$w}x{$h}:fps={$fps}",
+            "zoompan=z='1.3':x='if(eq(on,1),0,min(x+2,iw-iw/zoom))':y='ih/2-(ih/zoom/2)':d={$d}:s={$w}x{$h}:fps={$fps}",
+            "zoompan=z='1.3':x='iw/2-(iw/zoom/2)':y='if(eq(on,1),0,min(y+2,ih-ih/zoom))':d={$d}:s={$w}x{$h}:fps={$fps}",
+            "zoompan=z='1.3':x='if(eq(on,1),iw-iw/zoom,max(x-2,0))':y='ih/2-(ih/zoom/2)':d={$d}:s={$w}x{$h}:fps={$fps}",
+            "zoompan=z='min(zoom+0.001,1.4)':x='if(eq(on,1),0,min(x+1,iw-iw/zoom))':y='ih/2-(ih/zoom/2)':d={$d}:s={$w}x{$h}:fps={$fps}",
+        ];
+    }
+
+    /**
+     * @param list<string> $clips
+     */
+    private function concatenateWithTransitions(array $clips, string $output): void
+    {
+        $inputs = [];
+        foreach ($clips as $clip) {
+            $inputs[] = '-i';
+            $inputs[] = $clip;
         }
 
-        $concat
-            ->onFormat(new X264())
-            ->save(storage_path($output));
+        $filterComplex = $this->buildXfadeFilterComplex(count($clips));
+
+        $this->runFfmpeg(array_merge(
+            ['ffmpeg', '-y'],
+            $inputs,
+            [
+                '-filter_complex', $filterComplex,
+                '-map', '[final]',
+                '-c:v', 'libx264',
+                '-preset', 'medium',
+                '-crf', '18',
+                '-pix_fmt', 'yuv420p',
+                '-an',
+                $output,
+            ]
+        ));
+    }
+
+    private function buildXfadeFilterComplex(int $clipCount): string
+    {
+        $td = self::TRANSITION_DURATION;
+        $cd = self::CLIP_DURATION;
+        $parts = [];
+        $prevLabel = '[0:v]';
+
+        for ($i = 1; $i < $clipCount; $i++) {
+            $offset = $i * ($cd - $td);
+            $transition = self::TRANSITIONS[($i - 1) % count(self::TRANSITIONS)];
+            $outLabel = $i === $clipCount - 1 ? '[final]' : "[v{$i}]";
+
+            $parts[] = "{$prevLabel}[{$i}:v]xfade=transition={$transition}:duration={$td}:offset={$offset}{$outLabel}";
+            $prevLabel = $outLabel;
+        }
+
+        return implode(';', $parts);
+    }
+
+    /**
+     * @param list<string> $command
+     */
+    private function runFfmpeg(array $command): void
+    {
+        $process = new Process($command);
+        $process->setTimeout(300);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new Exception('FFmpeg error: ' . $process->getErrorOutput());
+        }
     }
 }

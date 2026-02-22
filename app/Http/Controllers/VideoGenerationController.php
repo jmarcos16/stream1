@@ -24,7 +24,6 @@ final class VideoGenerationController extends Controller
             new BuildVideoJob($video),
             // new MergeAudioVideoJob($video),
         ])
-        ->onQueue('video-generation')
         ->catch(function (\Throwable $e) use ($video) {
             $video->update(['status' => VideoStatus::FAILED]);
             // before implementing the broadcast event with reverb
