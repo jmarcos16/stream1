@@ -11,13 +11,18 @@ use function Laravel\Prompts\intro;
 class TesteVideoProcessor extends Command
 {
     protected $signature = 'app:teste';
+
     protected $description = 'Generate short-form video (9:16) from images with Ken Burns effect and transitions';
 
     private const WIDTH = 1080;
+
     private const HEIGHT = 1920;
+
     private const FPS = 30;
+
     private const CLIP_DURATION = 5;
-    private const TRANSITION_DURATION = 0.2;    
+
+    private const TRANSITION_DURATION = 0.2;
 
     private const TRANSITIONS = [
         'fade',
@@ -36,10 +41,11 @@ class TesteVideoProcessor extends Command
 
         if (empty($images)) {
             $this->error('No images found in the directory.');
+
             return;
         }
 
-        $this->info('Found ' . count($images) . ' images.');
+        $this->info('Found '.count($images).' images.');
 
         $tempDir = storage_path('app/videos/temp');
         $outputDir = storage_path('app/videos');
@@ -51,19 +57,19 @@ class TesteVideoProcessor extends Command
         if (count($clips) < 2) {
             $finalClip = $clips[0] ?? null;
             if ($finalClip) {
-                File::copy($finalClip, $outputDir . '/raw_video.mp4');
+                File::copy($finalClip, $outputDir.'/raw_video.mp4');
             }
         } else {
-            $this->concatenateWithTransitions($clips, $outputDir . '/raw_video.mp4');
+            $this->concatenateWithTransitions($clips, $outputDir.'/raw_video.mp4');
         }
 
         File::deleteDirectory($tempDir);
 
-        $this->info('Video saved to: ' . $outputDir . '/raw_video.mp4');
+        $this->info('Video saved to: '.$outputDir.'/raw_video.mp4');
     }
 
     /**
-     * @param list<string> $images
+     * @param  list<string>  $images
      * @return list<string>
      */
     private function buildClips(array $images, string $tempDir): array
@@ -72,10 +78,10 @@ class TesteVideoProcessor extends Command
         $effects = $this->getKenBurnsEffects();
 
         foreach ($images as $index => $imagePath) {
-            $outputPath = $tempDir . '/clip_' . str_pad((string) $index, 3, '0', STR_PAD_LEFT) . '.mp4';
+            $outputPath = $tempDir.'/clip_'.str_pad((string) $index, 3, '0', STR_PAD_LEFT).'.mp4';
             $effect = $effects[$index % count($effects)];
 
-            $this->info("Processing image {$index}: " . basename($imagePath));
+            $this->info("Processing image {$index}: ".basename($imagePath));
 
             $this->runFfmpeg([
                 'ffmpeg', '-y',
@@ -105,8 +111,8 @@ class TesteVideoProcessor extends Command
         $scaleH = $h * 2;
 
         return "scale={$scaleW}:{$scaleH}:force_original_aspect_ratio=increase,"
-             . "crop={$scaleW}:{$scaleH},"
-             . $zoompanFilter;
+             ."crop={$scaleW}:{$scaleH},"
+             .$zoompanFilter;
     }
 
     /**
@@ -135,11 +141,11 @@ class TesteVideoProcessor extends Command
     }
 
     /**
-     * @param list<string> $clips
+     * @param  list<string>  $clips
      */
     private function concatenateWithTransitions(array $clips, string $output): void
     {
-        $this->info('Concatenating ' . count($clips) . ' clips with transitions...');
+        $this->info('Concatenating '.count($clips).' clips with transitions...');
 
         $inputs = [];
         foreach ($clips as $clip) {
@@ -185,7 +191,7 @@ class TesteVideoProcessor extends Command
     }
 
     /**
-     * @param list<string> $command
+     * @param  list<string>  $command
      */
     private function runFfmpeg(array $command): void
     {
@@ -193,9 +199,9 @@ class TesteVideoProcessor extends Command
         $process->setTimeout(300);
         $process->run();
 
-        if (!$process->isSuccessful()) {
-            $this->error('FFmpeg error: ' . $process->getErrorOutput());
-            throw new \RuntimeException('FFmpeg process failed: ' . $process->getErrorOutput());
+        if (! $process->isSuccessful()) {
+            $this->error('FFmpeg error: '.$process->getErrorOutput());
+            throw new \RuntimeException('FFmpeg process failed: '.$process->getErrorOutput());
         }
     }
 
@@ -206,8 +212,9 @@ class TesteVideoProcessor extends Command
     {
         $imagesPath = storage_path('app/public/images');
 
-        if (!is_dir($imagesPath)) {
-            $this->error('Images directory does not exist: ' . $imagesPath);
+        if (! is_dir($imagesPath)) {
+            $this->error('Images directory does not exist: '.$imagesPath);
+
             return [];
         }
 
@@ -220,6 +227,6 @@ class TesteVideoProcessor extends Command
 
         usort($imageFiles, fn ($a, $b) => strcmp($a->getFilename(), $b->getFilename()));
 
-        return array_values(array_map(fn ($file) => $file->getRealPath(), $imageFiles));
+        return array_map(fn ($file) => $file->getRealPath(), $imageFiles);
     }
 }

@@ -13,13 +13,11 @@ final class Video extends Model
         'audio_path',
         'video_path',
         'raw_video_path',
-        'srt_path'
+        'srt_path',
     ];
 
     /**
      * Get the user that owns the video.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

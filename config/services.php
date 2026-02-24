@@ -14,6 +14,11 @@ return [
     |
     */
 
+    'elevenlabs' => [
+        'key' => env('ELEVENLABS_API_KEY'),
+        'voice_id' => env('ELEVENLABS_VOICE_ID', 'bIHbv24MWmeRgasZH58o'), // Will voice ID
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

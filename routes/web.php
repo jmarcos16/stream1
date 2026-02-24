@@ -1,10 +1,8 @@
 <?php
 
-use App\Http\Controllers\VideoCreatorController;
 use App\Http\Controllers\MediaUploadController;
+use App\Http\Controllers\VideoCreatorController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 Route::get('/', function () {
     return redirect()->route('video-creator');

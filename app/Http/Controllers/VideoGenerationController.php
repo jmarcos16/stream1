@@ -20,15 +20,15 @@ final class VideoGenerationController extends Controller
         ]);
 
         Bus::chain([
-            // new GenerateAudioJob($video),
+            new GenerateAudioJob($video),
             new BuildVideoJob($video),
             // new MergeAudioVideoJob($video),
         ])
-        ->catch(function (\Throwable $e) use ($video) {
-            $video->update(['status' => VideoStatus::FAILED]);
-            // before implementing the broadcast event with reverb
-        })
-        ->dispatch();
+            ->catch(function (\Throwable $e) use ($video) {
+                $video->update(['status' => VideoStatus::FAILED]);
+                // before implementing the broadcast event with reverb
+            })
+            ->dispatch();
 
         return response()
             ->json([

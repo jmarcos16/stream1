@@ -15,12 +15,17 @@ class BuildVideoJob implements ShouldQueue
     use Queueable;
 
     public int $tries = 3;
+
     public int $timeout = 300;
 
     private const WIDTH = 1080;
+
     private const HEIGHT = 1920;
+
     private const FPS = 30;
+
     private const CLIP_DURATION = 5;
+
     private const TRANSITION_DURATION = 0.3;
 
     private const TRANSITIONS = [
@@ -32,25 +37,27 @@ class BuildVideoJob implements ShouldQueue
         'wiperight',
     ];
 
-    public function __construct(public Video $video) { }
+    public function __construct(
+        public Video $video
+    ) {}
 
     public function handle(): void
     {
         $this->video->update(['status' => VideoStatus::PROCESSING]);
 
         $images = $this->getImages();
-        
+
         if (empty($images)) {
             throw new Exception('No images found to build the video.');
         }
 
-        $videoDir = storage_path('app/videos/' . $this->video->id);
+        $videoDir = storage_path('app/videos/'.$this->video->id);
         File::ensureDirectoryExists($videoDir);
-        
-        $tempDir = storage_path('app/videos/temp/' . $this->video->id);
+
+        $tempDir = storage_path('app/videos/temp/'.$this->video->id);
         File::ensureDirectoryExists($tempDir);
-        
-        $output = $videoDir . '/raw_video.mp4';
+
+        $output = $videoDir.'/raw_video.mp4';
 
         try {
             $clips = $this->buildClips($images, $tempDir);
@@ -66,7 +73,7 @@ class BuildVideoJob implements ShouldQueue
 
             $this->video->update([
                 'status' => VideoStatus::COMPLETED,
-                'raw_video_path' => 'videos/' . $this->video->id . '/raw_video.mp4',
+                'raw_video_path' => 'videos/'.$this->video->id.'/raw_video.mp4',
             ]);
         } finally {
             File::deleteDirectory($tempDir);
@@ -80,7 +87,7 @@ class BuildVideoJob implements ShouldQueue
     {
         $imagesPath = storage_path('app/public/images');
 
-        if (!is_dir($imagesPath)) {
+        if (! is_dir($imagesPath)) {
             return [];
         }
 
@@ -93,11 +100,11 @@ class BuildVideoJob implements ShouldQueue
 
         usort($imageFiles, fn ($a, $b) => strcmp($a->getFilename(), $b->getFilename()));
 
-        return array_values(array_map(fn ($file) => $file->getRealPath(), $imageFiles));
+        return array_map(fn ($file) => $file->getRealPath(), $imageFiles);
     }
 
     /**
-     * @param list<string> $images
+     * @param  list<string>  $images
      * @return list<string>
      */
     private function buildClips(array $images, string $tempDir): array
@@ -106,7 +113,7 @@ class BuildVideoJob implements ShouldQueue
         $effects = $this->getKenBurnsEffects();
 
         foreach ($images as $index => $imagePath) {
-            $outputPath = $tempDir . '/clip_' . str_pad((string) $index, 3, '0', STR_PAD_LEFT) . '.mp4';
+            $outputPath = $tempDir.'/clip_'.str_pad((string) $index, 3, '0', STR_PAD_LEFT).'.mp4';
             $effect = $effects[$index % count($effects)];
 
             $this->runFfmpeg([
@@ -136,8 +143,8 @@ class BuildVideoJob implements ShouldQueue
         $scaleH = $h * 2;
 
         return "scale={$scaleW}:{$scaleH}:force_original_aspect_ratio=increase,"
-             . "crop={$scaleW}:{$scaleH},"
-             . $zoompanFilter;
+             ."crop={$scaleW}:{$scaleH},"
+             .$zoompanFilter;
     }
 
     /**
@@ -161,7 +168,7 @@ class BuildVideoJob implements ShouldQueue
     }
 
     /**
-     * @param list<string> $clips
+     * @param  list<string>  $clips
      */
     private function concatenateWithTransitions(array $clips, string $output): void
     {
@@ -209,7 +216,7 @@ class BuildVideoJob implements ShouldQueue
     }
 
     /**
-     * @param list<string> $command
+     * @param  list<string>  $command
      */
     private function runFfmpeg(array $command): void
     {
@@ -217,8 +224,8 @@ class BuildVideoJob implements ShouldQueue
         $process->setTimeout(300);
         $process->run();
 
-        if (!$process->isSuccessful()) {
-            throw new Exception('FFmpeg error: ' . $process->getErrorOutput());
+        if (! $process->isSuccessful()) {
+            throw new Exception('FFmpeg error: '.$process->getErrorOutput());
         }
     }
 }
