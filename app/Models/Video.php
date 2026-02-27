@@ -11,6 +11,7 @@ final class Video extends Model
         'script',
         'status',
         'audio_path',
+        'audio_duration',
         'video_path',
         'raw_video_path',
         'srt_path',

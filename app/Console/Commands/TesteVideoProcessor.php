@@ -10,7 +10,7 @@ use function Laravel\Prompts\intro;
 
 class TesteVideoProcessor extends Command
 {
-    protected $signature = 'app:teste';
+    protected $signature = 'app:teste {--merge : Merge the latest audio and video files}';
 
     protected $description = 'Generate short-form video (9:16) from images with Ken Burns effect and transitions';
 
@@ -36,6 +36,12 @@ class TesteVideoProcessor extends Command
     public function handle(): void
     {
         intro('TesteVideoProcessor Command');
+
+        if ($this->option('merge')) {
+            $this->mergeLatestAudioVideo();
+
+            return;
+        }
 
         $images = $this->getImages();
 
@@ -66,6 +72,47 @@ class TesteVideoProcessor extends Command
         File::deleteDirectory($tempDir);
 
         $this->info('Video saved to: '.$outputDir.'/raw_video.mp4');
+    }
+
+    private function mergeLatestAudioVideo(): void
+    {
+        $audioDir = storage_path('app/private/audio');
+        $videosDir = storage_path('app/videos');
+
+        $audioFiles = collect(File::files($audioDir))
+            ->filter(fn ($f) => $f->getExtension() === 'mp3')
+            ->sortByDesc(fn ($f) => $f->getMTime());
+
+        $videoFiles = collect(File::allFiles($videosDir))
+            ->filter(fn ($f) => $f->getFilename() === 'raw_video.mp4')
+            ->sortByDesc(fn ($f) => $f->getMTime());
+
+        if ($audioFiles->isEmpty() || $videoFiles->isEmpty()) {
+            $this->error('No audio or video files found.');
+
+            return;
+        }
+
+        $audioPath = $audioFiles->first()->getRealPath();
+        $videoPath = $videoFiles->first()->getRealPath();
+
+        $this->info("Audio: {$audioPath}");
+        $this->info("Video: {$videoPath}");
+
+        $outputPath = $videosDir.'/merged_test.mp4';
+
+        $this->runFfmpeg([
+            'ffmpeg', '-y',
+            '-i', $videoPath,
+            '-i', $audioPath,
+            '-c:v', 'copy',
+            '-c:a', 'aac',
+            '-b:a', '192k',
+            '-shortest',
+            $outputPath,
+        ]);
+
+        $this->info("Merged video saved to: {$outputPath}");
     }
 
     /**

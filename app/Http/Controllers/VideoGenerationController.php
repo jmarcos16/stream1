@@ -22,7 +22,7 @@ final class VideoGenerationController extends Controller
         Bus::chain([
             new GenerateAudioJob($video),
             new BuildVideoJob($video),
-            // new MergeAudioVideoJob($video),
+            new MergeAudioVideoJob($video),
         ])
             ->catch(function (\Throwable $e) use ($video) {
                 $video->update(['status' => VideoStatus::FAILED]);

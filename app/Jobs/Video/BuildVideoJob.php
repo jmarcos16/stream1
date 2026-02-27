@@ -24,7 +24,7 @@ class BuildVideoJob implements ShouldQueue
 
     private const FPS = 30;
 
-    private const CLIP_DURATION = 5;
+    private const DEFAULT_CLIP_DURATION = 5;
 
     private const TRANSITION_DURATION = 0.3;
 
@@ -37,6 +37,8 @@ class BuildVideoJob implements ShouldQueue
         'wiperight',
     ];
 
+    private float $clipDuration = self::DEFAULT_CLIP_DURATION;
+
     public function __construct(
         public Video $video
     ) {}
@@ -45,11 +47,15 @@ class BuildVideoJob implements ShouldQueue
     {
         $this->video->update(['status' => VideoStatus::PROCESSING]);
 
+        $this->video->refresh();
+
         $images = $this->getImages();
 
         if (empty($images)) {
             throw new Exception('No images found to build the video.');
         }
+
+        $this->clipDuration = $this->calculateClipDuration(count($images));
 
         $videoDir = storage_path('app/videos/'.$this->video->id);
         File::ensureDirectoryExists($videoDir);
@@ -124,7 +130,7 @@ class BuildVideoJob implements ShouldQueue
                 '-preset', 'medium',
                 '-crf', '18',
                 '-pix_fmt', 'yuv420p',
-                '-t', (string) self::CLIP_DURATION,
+                '-t', (string) $this->clipDuration,
                 '-an',
                 $outputPath,
             ]);
@@ -152,7 +158,7 @@ class BuildVideoJob implements ShouldQueue
      */
     private function getKenBurnsEffects(): array
     {
-        $d = self::CLIP_DURATION * self::FPS;
+        $d = (int) ($this->clipDuration * self::FPS);
         $w = self::WIDTH;
         $h = self::HEIGHT;
         $fps = self::FPS;
@@ -199,7 +205,7 @@ class BuildVideoJob implements ShouldQueue
     private function buildXfadeFilterComplex(int $clipCount): string
     {
         $td = self::TRANSITION_DURATION;
-        $cd = self::CLIP_DURATION;
+        $cd = $this->clipDuration;
         $parts = [];
         $prevLabel = '[0:v]';
 
@@ -213,6 +219,15 @@ class BuildVideoJob implements ShouldQueue
         }
 
         return implode(';', $parts);
+    }
+
+    private function calculateClipDuration(int $imageCount): float
+    {
+        if ($this->video->audio_duration && $imageCount > 0) {
+            return $this->video->audio_duration / $imageCount;
+        }
+
+        return self::DEFAULT_CLIP_DURATION;
     }
 
     /**

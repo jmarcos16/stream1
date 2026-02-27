@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->string('video_path')->nullable();
             $table->string('audio_path')->nullable();
+            $table->float('audio_duration')->nullable();
             $table->string('raw_video_path')->nullable();
             $table->string('srt_path')->nullable();
             // $table->foreignId('user_id')->constrained();
