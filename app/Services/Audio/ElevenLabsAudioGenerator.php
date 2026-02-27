@@ -32,11 +32,12 @@ final class ElevenLabsAudioGenerator implements AudioGeneratorInterface
             'Accept' => 'audio/mpeg',
         ])->post("{$this->baseUrl}/text-to-speech/{$this->voiceId}", [
             'text' => $text,
-            'model_id' => 'eleven_monolingual_v1',
+            'model_id' => 'eleven_multilingual_v2',
             'voice_settings' => [
                 'stability' => 0.5,
                 'similarity_boost' => 0.75,
             ],
+            'speed' => 1.2,
         ]);
 
         if ($response->failed()) {

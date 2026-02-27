@@ -30,11 +30,6 @@ final class VideoGenerationController extends Controller
             })
             ->dispatch();
 
-        return response()
-            ->json([
-                'message' => 'Video generation started',
-                'video_id' => $video->id,
-                'status' => $video->status,
-            ], 202);
+        return to_route('video-creator');
     }
 }
