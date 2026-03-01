@@ -25,6 +25,8 @@ class StoreVideoProjectRequest extends FormRequest
             'script' => ['required', 'string', 'max:5000'],
             'aiVoiceover' => ['required', 'boolean'],
             'autoSubtitles' => ['required', 'boolean'],
+            'images' => ['required', 'array', 'min:1'],
+            'images.*' => ['required', 'string'],
         ];
     }
 }

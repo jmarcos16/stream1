@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 class BuildVideoJob implements ShouldQueue
@@ -57,10 +58,11 @@ class BuildVideoJob implements ShouldQueue
 
         $this->clipDuration = $this->calculateClipDuration(count($images));
 
-        $videoDir = storage_path('app/videos/'.$this->video->id);
+        $localDisk = Storage::disk('local');
+        $videoDir = $localDisk->path('videos/'.$this->video->id);
         File::ensureDirectoryExists($videoDir);
 
-        $tempDir = storage_path('app/videos/temp/'.$this->video->id);
+        $tempDir = $localDisk->path('videos/temp/'.$this->video->id);
         File::ensureDirectoryExists($tempDir);
 
         $output = $videoDir.'/raw_video.mp4';
@@ -91,7 +93,7 @@ class BuildVideoJob implements ShouldQueue
      */
     private function getImages(): array
     {
-        $imagesPath = storage_path('app/public/images');
+        $imagesPath = storage_path('app/public/images/'.$this->video->id);
 
         if (! is_dir($imagesPath)) {
             return [];

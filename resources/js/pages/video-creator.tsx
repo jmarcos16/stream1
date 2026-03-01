@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
@@ -19,11 +19,15 @@ export default function VideoCreator() {
         script: '',
         aiVoiceover: true,
         autoSubtitles: true,
+        images: [] as string[],
     });
 
     const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
-        form.submit('post', process.url());
+        router.post(process.url(), {
+            ...form.data,
+            images: uploadedImages.map((img) => img.path),
+        });
     };
 
     const handleReset = () => {
