@@ -19,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Audio\AudioGeneratorInterface::class,
             \App\Services\Audio\ElevenLabsAudioGenerator::class
         );
+
+        $this->app->bind(
+            \App\Services\Subtitle\SubtitleGeneratorInterface::class,
+            \App\Services\Subtitle\OpenAiSubtitleGenerator::class
+        );
     }
 
     /**

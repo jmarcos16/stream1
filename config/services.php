@@ -19,6 +19,11 @@ return [
         'voice_id' => env('ELEVENLABS_VOICE_ID', 'bIHbv24MWmeRgasZH58o'), // Will voice ID
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'whisper_model' => env('OPENAI_WHISPER_MODEL', 'whisper-1'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

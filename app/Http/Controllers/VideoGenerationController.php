@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVideoProjectRequest;
+use App\Jobs\Video\AddSubtitlesJob;
 use App\Jobs\Video\BuildVideoJob;
+use App\Jobs\Video\CleanupVideoFilesJob;
 use App\Jobs\Video\GenerateAudioJob;
 use App\Jobs\Video\MergeAudioVideoJob;
 use App\Models\Video;
@@ -25,6 +27,8 @@ final class VideoGenerationController extends Controller
             new GenerateAudioJob($video),
             new BuildVideoJob($video),
             new MergeAudioVideoJob($video),
+            new AddSubtitlesJob($video),
+            // new CleanupVideoFilesJob($video),desativar por enquanto para manter os arquivos para debug
         ])
             ->catch(function (\Throwable $e) use ($video) {
                 $video->update(['status' => VideoStatus::FAILED]);
