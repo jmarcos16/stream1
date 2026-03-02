@@ -1,124 +1,90 @@
+import { makeTransform, scale, translateY } from "@remotion/animation-utils";
+import { fitText } from "@remotion/layout-utils";
 import type { CSSProperties } from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
+import { MontserratBlack } from "../load-font";
 import type { WordTimestamp } from "./types";
 
-const WORDS_PER_GROUP = 8;
-const MAX_WORDS_PER_LINE = 4;
+const WORDS_PER_GROUP = 3;
+const DESIRED_FONT_SIZE = 100;
+const HIGHLIGHT_COLOR = "#FFFF00";
+const TEXT_COLOR = "#FFFFFF";
 
 function WordGroup({
     words,
     groupStart,
-    groupEnd,
+    enterProgress,
 }: {
     words: WordTimestamp[];
     groupStart: number;
-    groupEnd: number;
+    enterProgress: number;
 }) {
     const frame = useCurrentFrame();
-    const { fps } = useVideoConfig();
+    const { fps, width } = useVideoConfig();
     const currentTime = frame / fps;
 
-    const entryFrame = Math.floor(groupStart * fps);
-    const progress = spring({
-        frame: frame - entryFrame,
-        fps,
-        config: { damping: 20, stiffness: 120 },
+    const text = words.map((w) => w.word).join(" ");
+
+    const fittedFont = fitText({
+        fontFamily: MontserratBlack,
+        text: text.toUpperCase(),
+        withinWidth: width * 0.9,
     });
 
-    const exitStart = Math.floor(groupEnd * fps) - 6;
-    const exitEnd = Math.floor(groupEnd * fps);
-    const opacity = interpolate(frame, [exitStart, exitEnd], [1, 0], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-    });
-
-    const translateY = interpolate(progress, [0, 1], [30, 0]);
-
-    const lines: WordTimestamp[][] = [];
-    for (let i = 0; i < words.length; i += MAX_WORDS_PER_LINE) {
-        lines.push(words.slice(i, i + MAX_WORDS_PER_LINE));
-    }
+    const actualFontSize = Math.min(fittedFont.fontSize, DESIRED_FONT_SIZE);
 
     const containerStyle: CSSProperties = {
+        position: "relative",
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: `${actualFontSize * 0.2}px`,
+        justifyContent: "center",
         alignItems: "center",
-        gap: "12px",
-        opacity,
-        transform: `translateY(${translateY}px)`,
-    };
-
-    const bgStyle: CSSProperties = {
-        backgroundColor: "rgba(0, 0, 0, 0.65)",
-        borderRadius: "16px",
-        padding: "16px 28px",
-        backdropFilter: "blur(8px)",
+        lineHeight: 1.2,
+        maxWidth: "90%",
+        transform: makeTransform([
+            translateY(interpolate(enterProgress, [0, 1], [40, 0])),
+            scale(interpolate(enterProgress, [0, 1], [0.8, 1])),
+        ]),
+        opacity: enterProgress,
     };
 
     return (
         <div style={containerStyle}>
-            <div style={bgStyle}>
-                {lines.map((line, lineIdx) => {
-                    const lineStyle: CSSProperties = {
-                        display: "flex",
-                        flexWrap: "nowrap",
-                        justifyContent: "center",
-                        alignItems: "baseline",
-                        gap: "10px",
-                        lineHeight: 1.3,
-                    };
+            {words.map((w, i) => {
+                const isActive = currentTime >= w.start && currentTime < w.end;
 
-                    return (
-                        <div key={lineIdx} style={lineStyle}>
-                            {line.map((w, i) => {
-                                const isActive =
-                                    currentTime >= w.start && currentTime < w.end;
-                                const isPast = currentTime >= w.end;
+                const wordScale = spring({
+                    frame: isActive ? frame - Math.floor(w.start * fps) : 0,
+                    fps,
+                    config: { damping: 200 },
+                    durationInFrames: 5,
+                });
 
-                                const activeScale = spring({
-                                    frame: isActive
-                                        ? frame - Math.floor(w.start * fps)
-                                        : 0,
-                                    fps,
-                                    config: { damping: 12, stiffness: 200 },
-                                });
+                const wordStyle: CSSProperties = {
+                    fontSize: `${actualFontSize}px`,
+                    fontFamily: MontserratBlack,
+                    fontWeight: 900,
+                    color: isActive ? HIGHLIGHT_COLOR : TEXT_COLOR,
+                    textTransform: "uppercase",
+                    textShadow:
+                        "3px 3px 0px rgba(0, 0, 0, 1), -3px -3px 0px rgba(0, 0, 0, 1), 3px -3px 0px rgba(0, 0, 0, 1), -3px 3px 0px rgba(0, 0, 0, 1)",
+                    WebkitTextStroke: "2px black",
+                    paintOrder: "stroke fill",
+                    letterSpacing: "0.02em",
+                    transform: makeTransform([scale(wordScale)]),
+                    display: "inline-block",
+                    transition: "color 0.1s ease",
+                };
 
-                                const scale = isActive
-                                    ? interpolate(activeScale, [0, 1], [1, 1.1])
-                                    : 1;
-
-                                let color = "#FFFFFF";
-                                if (isActive) {
-                                    color = "#38BDF8";
-                                } else if (isPast) {
-                                    color = "#94A3B8";
-                                }
-
-                                const wordStyle: CSSProperties = {
-                                    fontSize: "52px",
-                                    fontWeight: isActive ? 900 : 700,
-                                    fontFamily:
-                                        "'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif",
-                                    color,
-                                    textShadow: isActive
-                                        ? "0 0 16px rgba(56,189,248,0.4)"
-                                        : "none",
-                                    transform: `scale(${scale})`,
-                                    display: "inline-block",
-                                    textTransform: "uppercase",
-                                };
-
-                                return (
-                                    <span key={`${w.word}-${i}`} style={wordStyle}>
-                                        {w.word}
-                                    </span>
-                                );
-                            })}
-                        </div>
-                    );
-                })}
-            </div>
+                return (
+                    <span key={`${w.word}-${i}`} style={wordStyle}>
+                        {w.word.toUpperCase()}
+                    </span>
+                );
+            })}
         </div>
     );
 }
@@ -139,18 +105,27 @@ export function WordHighlight({ words }: { words: WordTimestamp[] }) {
     }
 
     const activeGroup = groups.find(
-        (g) => currentTime >= g.start && currentTime < g.end + 0.3,
+        (g) => currentTime >= g.start && currentTime < g.end + 0.1,
     );
 
     if (!activeGroup) {
         return null;
     }
 
+    const enterProgress = spring({
+        frame,
+        fps,
+        config: {
+            damping: 200,
+        },
+        durationInFrames: 5,
+    });
+
     const overlayStyle: CSSProperties = {
         position: "absolute",
-        bottom: "12%",
-        left: "6%",
-        right: "6%",
+        bottom: "20%",
+        left: 0,
+        right: 0,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -162,7 +137,7 @@ export function WordHighlight({ words }: { words: WordTimestamp[] }) {
             <WordGroup
                 words={activeGroup.words}
                 groupStart={activeGroup.start}
-                groupEnd={activeGroup.end}
+                enterProgress={enterProgress}
             />
         </div>
     );

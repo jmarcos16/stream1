@@ -69,3 +69,4 @@ applyTo: '**'
 - Docblocks devem incluir tipos de parâmetros, tipos de retorno e exceções lançadas quando apropriado.
 - Comentários em docblocks devem estar em inglês.
 - Mantenha a documentação concisa e sem comentários redundantes inline no código.
+- Evite criar testes, a menos que seja solicitado.

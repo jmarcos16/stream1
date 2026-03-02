@@ -14,6 +14,8 @@ return [
     |
     */
 
+    'audio_generator' => env('AUDIO_GENERATOR', 'elevenlabs'),
+
     'elevenlabs' => [
         'key' => env('ELEVENLABS_API_KEY'),
         'voice_id' => env('ELEVENLABS_VOICE_ID', 'bIHbv24MWmeRgasZH58o'), // Will voice ID
@@ -22,6 +24,8 @@ return [
     'openai' => [
         'key' => env('OPENAI_API_KEY'),
         'whisper_model' => env('OPENAI_WHISPER_MODEL', 'whisper-1'),
+        'tts_model' => env('OPENAI_TTS_MODEL', 'tts-1'),
+        'tts_voice' => env('OPENAI_TTS_VOICE', 'alloy'),
     ],
 
     'postmark' => [
