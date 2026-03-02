@@ -1,7 +1,6 @@
-import { makeTransform, scale, translateY } from "@remotion/animation-utils";
 import { fitText } from "@remotion/layout-utils";
 import type { CSSProperties } from "react";
-import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { useCurrentFrame, useVideoConfig } from "remotion";
 
 import { MontserratBlack } from "../load-font";
 import type { WordTimestamp } from "./types";
@@ -11,15 +10,7 @@ const DESIRED_FONT_SIZE = 100;
 const HIGHLIGHT_COLOR = "#FFFF00";
 const TEXT_COLOR = "#FFFFFF";
 
-function WordGroup({
-    words,
-    groupStart,
-    enterProgress,
-}: {
-    words: WordTimestamp[];
-    groupStart: number;
-    enterProgress: number;
-}) {
+function WordGroup({ words }: { words: WordTimestamp[] }) {
     const frame = useCurrentFrame();
     const { fps, width } = useVideoConfig();
     const currentTime = frame / fps;
@@ -44,24 +35,12 @@ function WordGroup({
         alignItems: "center",
         lineHeight: 1.2,
         maxWidth: "90%",
-        transform: makeTransform([
-            translateY(interpolate(enterProgress, [0, 1], [40, 0])),
-            scale(interpolate(enterProgress, [0, 1], [0.8, 1])),
-        ]),
-        opacity: enterProgress,
     };
 
     return (
         <div style={containerStyle}>
             {words.map((w, i) => {
                 const isActive = currentTime >= w.start && currentTime < w.end;
-
-                const wordScale = spring({
-                    frame: isActive ? frame - Math.floor(w.start * fps) : 0,
-                    fps,
-                    config: { damping: 200 },
-                    durationInFrames: 5,
-                });
 
                 const wordStyle: CSSProperties = {
                     fontSize: `${actualFontSize}px`,
@@ -74,9 +53,7 @@ function WordGroup({
                     WebkitTextStroke: "2px black",
                     paintOrder: "stroke fill",
                     letterSpacing: "0.02em",
-                    transform: makeTransform([scale(wordScale)]),
                     display: "inline-block",
-                    transition: "color 0.1s ease",
                 };
 
                 return (
@@ -112,15 +89,6 @@ export function WordHighlight({ words }: { words: WordTimestamp[] }) {
         return null;
     }
 
-    const enterProgress = spring({
-        frame,
-        fps,
-        config: {
-            damping: 200,
-        },
-        durationInFrames: 5,
-    });
-
     const overlayStyle: CSSProperties = {
         position: "absolute",
         bottom: "20%",
@@ -134,11 +102,7 @@ export function WordHighlight({ words }: { words: WordTimestamp[] }) {
 
     return (
         <div style={overlayStyle}>
-            <WordGroup
-                words={activeGroup.words}
-                groupStart={activeGroup.start}
-                enterProgress={enterProgress}
-            />
+            <WordGroup words={activeGroup.words} />
         </div>
     );
 }

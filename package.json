@@ -9,6 +9,7 @@
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
+        "remotion:preview": "npx remotion studio remotion/src/index.ts",
         "types": "tsc --noEmit"
     },
     "devDependencies": {

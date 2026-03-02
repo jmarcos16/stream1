@@ -31,6 +31,18 @@ const absoluteVideoPath = path.resolve(videoPath);
 const videoDir = path.dirname(absoluteVideoPath);
 const videoFileName = path.basename(absoluteVideoPath);
 
+const fontSource = path.resolve(
+    import.meta.dirname,
+    "..",
+    "public",
+    "Montserrat-Black.ttf",
+);
+const fontDest = path.join(videoDir, "Montserrat-Black.ttf");
+
+if (!fs.existsSync(fontDest)) {
+    fs.copyFileSync(fontSource, fontDest);
+}
+
 const entryPoint = path.resolve(import.meta.dirname, "src/index.ts");
 
 console.log("Bundling Remotion composition...");
