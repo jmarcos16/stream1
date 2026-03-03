@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use App\VideoStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 final class Video extends Model
 {
+    protected $appends = ['status_label'];
+
     protected $fillable = [
+        'title',
         'script',
         'status',
         'audio_path',
@@ -30,6 +34,13 @@ final class Video extends Model
      *
      * @return array<string, string>
      */
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->status->label(),
+        );
+    }
+
     protected function casts(): array
     {
         return [

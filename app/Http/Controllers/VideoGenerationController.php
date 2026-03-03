@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreVideoProjectRequest;
 use App\Jobs\Video\AddSubtitlesJob;
 use App\Jobs\Video\BuildVideoJob;
-use App\Jobs\Video\CleanupVideoFilesJob;
 use App\Jobs\Video\GenerateAudioJob;
 use App\Jobs\Video\MergeAudioVideoJob;
 use App\Models\Video;
@@ -17,6 +16,7 @@ final class VideoGenerationController extends Controller
     public function process(StoreVideoProjectRequest $request)
     {
         $video = Video::query()->create([
+            'title' => $request->input('title'),
             'script' => $request->input('script'),
             'status' => VideoStatus::PENDING,
         ]);

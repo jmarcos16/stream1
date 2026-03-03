@@ -2,71 +2,72 @@
 applyTo: '**'
 ---
 
-# Padrões de Código
+# Code Standards
 
-## Nomenclatura e Idioma
+## Naming and Language
 
-- **Use termos em inglês** - Variáveis, funções, classes, constantes e identificadores devem ser nomeados em inglês.
-- **Exceção**: Comentários e documentação podem estar em português, mas nomes no código sempre em inglês.
+- **Use English terms** - Variables, functions, classes, constants, and identifiers must be named in English.
+- **Exception**: Comments and documentation can be in Portuguese, but code names always in English.
 
-## Comentários
+## Comments
 
-- **Proibido adicionar comentários no código** - O código deve ser auto-explicativo através de nomes descritivos de variáveis, funções e componentes.
-- Excluir comentários inline que expliquem a lógica - Se o código precisa de explicação, refatore-o para ser mais claro.
-- PHPDoc/JSDoc (docstrings) é permitido para funções públicas e componentes complexos, mas mantenha-o conciso.
+- **Avoid adding comments in code** - Code should be self-explanatory through descriptive names of variables, functions, and components.
+- Remove inline comments that explain logic - If code needs explanation, refactor it to be clearer.
+- PHPDoc/JSDoc (docstrings) are allowed for public functions and complex components, but keep them concise.
 
-## React - Boas Práticas
+## React - Best Practices
 
 ### Types/TypeScript
 
-- **Sempre use types** - Todo componente React e hook deve ter tipos TypeScript explícitos para props, estados e retornos.
-- **Organize types em arquivos dedicados** - Types devem estar sempre em `resources/js/types/` em arquivos com nomes que façam sentido e reflitam seu domínio (ex: `auth.ts`, `ui.ts`, `navigation.ts`).
-- **Importe tipos dos arquivos organizados** - Não defina tipos inline; sempre importe de `resources/js/types/`.
+- **Always use types** - Every React component and hook must have explicit TypeScript types for props, state, and returns.
+- **Organize types in dedicated files** - Types should always be in `resources/js/types/` in files with meaningful names that reflect their domain (e.g., `auth.ts`, `ui.ts`, `navigation.ts`).
+- **Import types from organized files** - Do not define types inline; always import from `resources/js/types/`.
 
-### Componentes
+### Components
 
-- **Use componentes funcionais com hooks** - Evite class components. Sempre use functional components.
-- **Use composição sobre herança** - Componentes devem ser compostos a partir de componentes menores, não estendidos.
-- **Memoize componentes quando apropriado** - Use `React.memo` para evitar re-renders desnecessários em componentes puros.
-- **Use Fragments** - Prefira `<>...</>` ou `<React.Fragment>` para evitar elementos DOM desnecessários.
-- **Props com validação** - Use PropTypes para validar as props de cada componente.
+- **Use functional components with hooks** - Avoid class components. Always use functional components.
+- **Use composition over inheritance** - Components should be composed from smaller components, not extended.
+- **Memoize components when appropriate** - Use `React.memo` to avoid unnecessary re-renders in pure components.
+- **Use Fragments** - Prefer `<>...</>` or `<React.Fragment>` to avoid unnecessary DOM elements.
+- **Props with validation** - Use PropTypes to validate the props of each component.
+- **Prioritize shadcn/ui components** - Use shadcn/ui components whenever possible for consistency and maintainability. If required components are not installed, suggest their installation.
 
 ### Hooks
 
-- **Extraia lógica reutilizável em custom hooks** - Não repita lógica em múltiplos componentes.
-- **Use hooks do React corretamente** - Sempre declare hooks no topo do componente, nunca dentro de loops ou condições.
-- **Nomes descritivos para custom hooks** - Comece com `use` (ex: `useUserData`, `useFetchData`).
+- **Extract reusable logic into custom hooks** - Do not repeat logic across multiple components.
+- **Use React hooks correctly** - Always declare hooks at the top of the component, never inside loops or conditions.
+- **Descriptive names for custom hooks** - Start with `use` (e.g., `useUserData`, `useFetchData`).
 
-### Listas e Chaves
+### Lists and Keys
 
-- **Sempre use keys em listas** - Nunca use o índice da array como key.
-- **Keys devem ser únicas e estáveis** - Use IDs ou identificadores únicos dos dados.
+- **Always use keys in lists** - Never use the array index as a key.
+- **Keys must be unique and stable** - Use IDs or unique identifiers from the data.
 
 ### Performance
 
-- **Evite renders desnecessários** - Use useCallback e useMemo quando apropriado.
-- **Lazy load componentes** - Use React.lazy e Suspense para componentes pesados.
-- **Otimize seletores de estado** - No Redux ou Context, crie seletores para evitar re-renders em mudanças desnecessárias.
+- **Avoid unnecessary renders** - Use useCallback and useMemo when appropriate.
+- **Lazy load components** - Use React.lazy and Suspense for heavy components.
+- **Optimize state selectors** - In Redux or Context, create selectors to avoid re-renders on unnecessary changes.
 
-### Estrutura de Componentes
+### Component Structure
 
-- **Separação de responsabilidades** - Componentes de container e apresentação devem estar separados quando apropriado.
-- **Props simples e diretas** - Evite passar muitos props; use composição ou contexto quando necessário.
-- **Nomes descritivos** - Nomes de componentes e funções devem descrever claramente sua função (ex: `UserCard`, `handleSubmit`, `isAuthenticated`).
+- **Separation of concerns** - Container and presentation components should be separated when appropriate.
+- **Simple and direct props** - Avoid passing too many props; use composition or context when needed.
+- **Descriptive names** - Component and function names should clearly describe their purpose (e.g., `UserCard`, `handleSubmit`, `isAuthenticated`).
 
-### Estado e Efeitos
+### State and Effects
 
-- **Mantenha estado no menor escopo possível** - Levante estado apenas quando necessário.
-- **Efeitos focados** - Cada `useEffect` deve ter uma única responsabilidade.
-- **Limpeza de efeitos** - Sempre limpe subscriptions, timeouts e listeners em `useEffect` return.
-- **Dependências corretas** - Array de dependências do `useEffect` deve incluir todas as variáveis externas usadas.
+- **Keep state in the smallest scope possible** - Lift state only when necessary.
+- **Focused effects** - Each `useEffect` should have a single responsibility.
+- **Clean up effects** - Always clean up subscriptions, timeouts, and listeners in `useEffect` return.
+- **Correct dependencies** - The `useEffect` dependency array must include all external variables used.
 
-## PHP - Boas Práticas
+## PHP - Best Practices
 
 ### PHPDoc / PHPStan
 
-- **Siga as regras de docblock do PHPStan** - Sempre mantenha docblocks alinhados com as regras de análise estática do PHPStan.
-- Docblocks devem incluir tipos de parâmetros, tipos de retorno e exceções lançadas quando apropriado.
-- Comentários em docblocks devem estar em inglês.
-- Mantenha a documentação concisa e sem comentários redundantes inline no código.
-- Evite criar testes, a menos que seja solicitado.
+- **Follow PHPStan docblock rules** - Always keep docblocks aligned with PHPStan static analysis rules.
+- Docblocks should include parameter types, return types, and exceptions thrown when appropriate.
+- Comments in docblocks must be in English.
+- Keep documentation concise without redundant inline comments in code.
+- Avoid creating tests unless requested.

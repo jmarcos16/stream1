@@ -3,11 +3,11 @@ import { Button } from '@/components/ui/button';
 import type { UploadedImage } from '@/types/upload';
 import type { UploadedFile } from '@/types/upload';
 
-interface ImageListProps {
+type ImageListProps = {
     items: (UploadedImage | UploadedFile)[];
     onRemove: (id: string) => void;
     title?: string;
-}
+};
 
 function isUploadedFile(item: UploadedImage | UploadedFile): item is UploadedFile {
     return 'file' in item;

@@ -22,6 +22,7 @@ class StoreVideoProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'title' => ['required', 'string', 'max:255'],
             'script' => ['required', 'string', 'max:5000'],
             'aiVoiceover' => ['required', 'boolean'],
             'autoSubtitles' => ['required', 'boolean'],
