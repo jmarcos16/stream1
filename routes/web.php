@@ -14,6 +14,9 @@ Route::get('video-creator', [VideoCreatorController::class, 'index'])
 Route::get('v2/video-creator', [VideoCreatorController::class, 'v2'])
     ->name('video-creator.v2');
 
+Route::get('v2/video-creator/new', [VideoCreatorController::class, 'v2Wizard'])
+    ->name('video-creator.v2.wizard');
+
 Route::post('video/generate', [\App\Http\Controllers\VideoGenerationController::class, 'process'])
     ->name('video.generate');
 

@@ -33,4 +33,12 @@ class VideoCreatorController extends Controller
             'videos' => $videos,
         ]);
     }
+
+    /**
+     * Handle the V2 multi-step wizard request.
+     */
+    public function v2Wizard(): Response
+    {
+        return Inertia::render('video-creator-v2-wizard');
+    }
 }
