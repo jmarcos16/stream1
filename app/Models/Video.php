@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\VideoStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,6 +28,19 @@ final class Video extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Scope to filter videos by status type.
+     */
+    public function scopeByStatus(Builder $query, string $status): Builder
+    {
+        return match ($status) {
+            'processing' => $query->whereIn('status', ['processing', 'pending']),
+            'completed' => $query->where('status', 'completed'),
+            'drafts' => $query->where('status', 'draft'),
+            default => $query,
+        };
     }
 
     /**

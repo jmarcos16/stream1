@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { DashboardV2Layout } from '@/layouts/dashboard-v2-layout';
 import { StepIndicator } from '@/components/wizard/StepIndicator';
 import { MediaAssetsStep } from '@/components/wizard/steps/MediaAssetsStep';

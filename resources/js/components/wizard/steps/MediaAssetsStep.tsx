@@ -8,7 +8,7 @@ type Props = {
 
 export function MediaAssetsStep({ onNext }: Props) {
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden min-h-[500px] flex flex-col">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden min-h-125 flex flex-col">
             <div className="p-8 flex-1">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
@@ -44,7 +44,7 @@ export function MediaAssetsStep({ onNext }: Props) {
                     Cancel
                 </Link>
                 <button onClick={onNext} className="px-8 py-2.5 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center gap-2">
-                    Next: Video Script
+                    Video Script
                     <ChevronRight className="w-5 h-5" />
                 </button>
             </div>

@@ -6,15 +6,34 @@ type Props = {
 };
 
 export function CompletedVideoCard({ video }: Props) {
+    const hasThumbnail = video.video_path;
+
     return (
         <div className="group flex items-center gap-5 bg-white border border-slate-200 p-4 rounded-xl hover:border-indigo-500/20 hover:bg-slate-50/50 transition-all">
             <div className="relative size-20 rounded-lg overflow-hidden shrink-0 shadow-sm border border-slate-100">
-                <video className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={video.video_path || ''}></video>
-                <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-white rounded-full p-2.5 shadow-lg">
-                        <Play className="size-5 text-indigo-500 fill-indigo-500 ml-0.5" />
-                    </div>
-                </div>
+                {hasThumbnail ? (
+                    <>
+                        <video className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={video?.video_path}></video>
+                        <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="bg-white rounded-full p-2.5 shadow-lg">
+                                <Play className="size-5 text-indigo-500 fill-indigo-500 ml-0.5" />
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <img 
+                            src={`https://picsum.photos/200/200?random=${video.id}`}
+                            alt={video.title || `Video ${video.id}`}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="bg-white rounded-full p-2.5 shadow-lg">
+                                <Play className="size-5 text-indigo-500 fill-indigo-500 ml-0.5" />
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">

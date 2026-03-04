@@ -8,8 +8,15 @@ type Props = {
 export function ActiveVideoCard({ video }: Props) {
     return (
         <div className="shimmer-effect group flex flex-col md:flex-row md:items-center gap-5 bg-white border border-slate-200 p-5 rounded-xl hover:border-indigo-500/40 transition-all hover:shadow-md">
-            <div className="relative size-24 md:size-20 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                <LoaderCircle className="text-indigo-500 size-8 animate-spin" style={{ animationDuration: '3s' }} />
+            <div className="relative size-24 md:size-20 rounded-lg overflow-hidden shrink-0">
+                <img 
+                    src={`https://picsum.photos/200/200?random=${video.id}`} 
+                    alt={video.title || `Video ${video.id}`}
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-slate-900/20 flex items-center justify-center">
+                    <LoaderCircle className="text-white size-6 animate-spin" style={{ animationDuration: '3s' }} />
+                </div>
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">

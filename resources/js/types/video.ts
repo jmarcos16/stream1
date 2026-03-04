@@ -6,7 +6,7 @@ export type Video = {
     status_label: string;
     audio_path: string | null;
     audio_duration: number | null;
-    video_path: string | null;
+    video_path: string | undefined;
     raw_video_path: string | null;
     srt_path: string | null;
     created_at: string;

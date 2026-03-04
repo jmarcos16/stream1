@@ -109,7 +109,7 @@ export function GenerationSettingsStep({ onBack }: Props) {
             <div className="bg-slate-50 border-t border-slate-100 p-6 flex items-center justify-between">
                 <button onClick={onBack} className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 flex items-center gap-2">
                     <ChevronLeft className="w-5 h-5" />
-                    Back: Video Script
+                    Video Script
                 </button>
                 <Link href="#" className="px-10 py-3 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition-all flex items-center gap-2">
                     Generate Video

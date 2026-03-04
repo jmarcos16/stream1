@@ -21,24 +21,18 @@ class VideoCreatorController extends Controller
     }
 
     /**
-     * Handle the V2 incoming request.
+     * Handle the V2 incoming request, the new video creator experience with the wizard and all the new features.
      */
     public function v2(): Response
     {
         $videos = Video::query()
+            ->byStatus(request('status', 'all'))
             ->latest()
             ->get();
 
         return Inertia::render('video-creator-v2', [
             'videos' => $videos,
+            'currentStatus' => $status ?? 'all',
         ]);
-    }
-
-    /**
-     * Handle the V2 multi-step wizard request.
-     */
-    public function v2Wizard(): Response
-    {
-        return Inertia::render('video-creator-v2-wizard');
     }
 }
