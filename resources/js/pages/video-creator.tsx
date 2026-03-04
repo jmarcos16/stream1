@@ -21,7 +21,7 @@ export default function VideoCreator({ videos }: Props) {
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
     const form = useForm({
-        projectTitle: 'Untitled_Project_01',
+        title: 'Untitled_Project_01',
         script: '',
         aiVoiceover: true,
         autoSubtitles: true,
@@ -48,9 +48,9 @@ export default function VideoCreator({ videos }: Props) {
                 <main className="flex flex-1">
                     <aside className="flex w-96 flex-col border-r border-solid border-[#27272a] bg-[#09090b]">
                         <VideoProjectHeader
-                            title={form.data.projectTitle}
+                            title={form.data.title}
                             onTitleChange={(title) =>
-                                form.setData('projectTitle', title)
+                                form.setData('title', title)
                             }
                         />
 

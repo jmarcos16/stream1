@@ -21,14 +21,6 @@ class GenerateAudioJob implements ShouldQueue
         $this->video->refresh();
         $this->video->update(['status' => \App\VideoStatus::PROCESSING]);
 
-        if ('videos/9/final_video.mp4' && Storage::disk('local')->exists('videos/9/final_video.mp4')) {
-            $this->video->update([
-                'audio_path' => 'audio/9_69a4d48b347a6.mp3',
-                'audio_duration' => 62.406531,
-            ]);
-            return;
-        }
-
         $path = 'audio/'.$this->video->id.'_'.uniqid().'.mp3';
         $savedPath = $audioGenerator->generate($this->video->script, $path);
 
