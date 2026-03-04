@@ -8,6 +8,7 @@ enum VideoStatus: string
     case PROCESSING = 'processing';
     case COMPLETED = 'completed';
     case FAILED = 'failed';
+    case DRAFT = 'draft';
 
     public function label(): string
     {
@@ -16,6 +17,18 @@ enum VideoStatus: string
             self::PROCESSING => 'Processing',
             self::COMPLETED => 'Completed',
             self::FAILED => 'Failed',
+            self::DRAFT => 'Draft',
+        };
+    }
+
+    public function color(): string
+    {
+        return match ($this) {
+            self::PENDING => 'gray',
+            self::PROCESSING => 'blue',
+            self::COMPLETED => 'green',
+            self::FAILED => 'red',
+            self::DRAFT => 'yellow',
         };
     }
 }

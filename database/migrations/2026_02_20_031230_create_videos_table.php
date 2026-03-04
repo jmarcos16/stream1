@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('script');
+            $table->text('script')->nullable();
             $table->string('status')->default('pending');
             $table->string('video_path')->nullable();
             $table->string('audio_path')->nullable();
