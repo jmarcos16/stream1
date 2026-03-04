@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
+import { ChevronRight } from 'lucide-react';
 import { DashboardV2Layout } from '@/layouts/dashboard-v2-layout';
 import { StepIndicator } from '@/components/wizard/StepIndicator';
 import { MediaAssetsStep } from '@/components/wizard/steps/MediaAssetsStep';
@@ -19,7 +20,7 @@ export default function VideoCreatorV2Wizard() {
                 <div className="mb-8">
                     <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
                         <Link href={v2()} className="hover:text-indigo-500 transition-colors">All Videos</Link>
-                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                        <ChevronRight className="w-4 h-4" />
                         <span className="font-medium text-slate-900">New Project</span>
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">Create New Project</h2>

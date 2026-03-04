@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { Settings, Palette, ChevronUp, Film, Brush, Building2, Video, ChevronDown, Mic, Captions, Maximize2, ChevronLeft, Zap } from 'lucide-react';
 
 type Props = {
     onBack: () => void;
@@ -11,7 +12,7 @@ export function GenerationSettingsStep({ onBack }: Props) {
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center gap-3">
                         <div className="size-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500">
-                            <span className="material-symbols-outlined">tune</span>
+                            <Settings className="w-5 h-5" />
                         </div>
                         <div>
                             <h3 className="text-lg font-bold text-slate-900">Generation Settings</h3>
@@ -27,28 +28,28 @@ export function GenerationSettingsStep({ onBack }: Props) {
                             <div className="flex items-center gap-3">
                                 <span className="size-7 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">1</span>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                                    <span className="material-symbols-outlined text-[18px]">palette</span>
+                                    <Palette className="w-4 h-4" />
                                     Visual Styles
                                 </label>
                             </div>
-                            <span className="material-symbols-outlined text-slate-400">expand_less</span>
+                            <ChevronUp className="w-5 h-5 text-slate-400" />
                         </div>
                         <div className="p-6 space-y-6">
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 <button className="flex flex-col items-center gap-3 p-4 border-2 border-indigo-500 bg-indigo-500/5 rounded-xl transition-all">
-                                    <span className="material-symbols-outlined text-indigo-500 text-3xl">movie</span>
+                                    <Film className="w-7 h-7 text-indigo-500" />
                                     <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-tight">Cinematic</span>
                                 </button>
                                 <button className="flex flex-col items-center gap-3 p-4 border-2 border-slate-100 hover:border-slate-200 rounded-xl transition-all">
-                                    <span className="material-symbols-outlined text-slate-400 text-3xl">brush</span>
+                                    <Brush className="w-7 h-7 text-slate-400" />
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Artistic</span>
                                 </button>
                                 <button className="flex flex-col items-center gap-3 p-4 border-2 border-slate-100 hover:border-slate-200 rounded-xl transition-all">
-                                    <span className="material-symbols-outlined text-slate-400 text-3xl">corporate_fare</span>
+                                    <Building2 className="w-7 h-7 text-slate-400" />
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Corporate</span>
                                 </button>
                                 <button className="flex flex-col items-center gap-3 p-4 border-2 border-slate-100 hover:border-slate-200 rounded-xl transition-all">
-                                    <span className="material-symbols-outlined text-slate-400 text-3xl">videocam</span>
+                                    <Video className="w-7 h-7 text-slate-400" />
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Vlog</span>
                                 </button>
                             </div>
@@ -67,11 +68,11 @@ export function GenerationSettingsStep({ onBack }: Props) {
                             <div className="flex items-center gap-3">
                                 <span className="size-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold">2</span>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-500">
-                                    <span className="material-symbols-outlined text-[18px]">mic</span>
+                                    <Mic className="w-4 h-4" />
                                     Audio &amp; Voiceover
                                 </label>
                             </div>
-                            <span className="material-symbols-outlined text-slate-400">expand_more</span>
+                            <ChevronDown className="w-5 h-5 text-slate-400" />
                         </div>
                     </div>
 
@@ -81,11 +82,11 @@ export function GenerationSettingsStep({ onBack }: Props) {
                             <div className="flex items-center gap-3">
                                 <span className="size-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold">3</span>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-500">
-                                    <span className="material-symbols-outlined text-[18px]">subtitles</span>
+                                    <Captions className="w-4 h-4" />
                                     Subtitles &amp; Captions
                                 </label>
                             </div>
-                            <span className="material-symbols-outlined text-slate-400">expand_more</span>
+                            <ChevronDown className="w-5 h-5 text-slate-400" />
                         </div>
                     </div>
 
@@ -95,11 +96,11 @@ export function GenerationSettingsStep({ onBack }: Props) {
                             <div className="flex items-center gap-3">
                                 <span className="size-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold">4</span>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-500">
-                                    <span className="material-symbols-outlined text-[18px]">aspect_ratio</span>
+                                    <Maximize2 className="w-4 h-4" />
                                     Output Configuration
                                 </label>
                             </div>
-                            <span className="material-symbols-outlined text-slate-400">expand_more</span>
+                            <ChevronDown className="w-5 h-5 text-slate-400" />
                         </div>
                     </div>
                 </div>
@@ -107,12 +108,12 @@ export function GenerationSettingsStep({ onBack }: Props) {
 
             <div className="bg-slate-50 border-t border-slate-100 p-6 flex items-center justify-between">
                 <button onClick={onBack} className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                    <ChevronLeft className="w-5 h-5" />
                     Back: Video Script
                 </button>
                 <Link href="#" className="px-10 py-3 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition-all flex items-center gap-2">
                     Generate Video
-                    <span className="material-symbols-outlined text-[20px]">bolt</span>
+                    <Zap className="w-5 h-5" />
                 </Link>
             </div>
         </div>
