@@ -16,6 +16,6 @@ final class StoreDraftVideoController extends Controller
             'status' => 'draft',
         ]);
 
-        return redirect()->route('video-creator.v2.edit', $video->id);
+        return to_route('video-creator.v2.edit', $video->id);
     }
 }

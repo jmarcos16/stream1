@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\MediaUploadController;
-use App\Http\Controllers\Video\CreateVideoProjectController;
 use App\Http\Controllers\Video\EditVideoDraftController;
 use App\Http\Controllers\Video\StoreDraftVideoController;
 use App\Http\Controllers\VideoCreatorController;
@@ -16,9 +15,6 @@ Route::get('video-creator', [VideoCreatorController::class, 'index'])
 
 Route::get('v2/video-creator', [VideoCreatorController::class, 'v2'])
     ->name('video-creator.v2');
-
-Route::get('v2/video-creator/new', CreateVideoProjectController::class)
-    ->name('video-creator.v2.wizard');
 
 Route::post('v2/video-creator/draft', StoreDraftVideoController::class)
     ->name('video-creator.v2.draft.store');
