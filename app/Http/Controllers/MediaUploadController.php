@@ -36,4 +36,11 @@ final class MediaUploadController extends Controller
 
         return redirect()->back()->with('uploadedFiles', $uploadedFiles);
     }
+
+    public function delete(Video $video, string $filename): RedirectResponse
+    {
+        Storage::disk('public')->delete("videos/{$video->id}/images/{$filename}");
+
+        return redirect()->back();
+    }
 }

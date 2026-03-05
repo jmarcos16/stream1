@@ -10,7 +10,7 @@ import VideoProjectHeader from '@/components/video-project-header';
 import VideoList from '@/components/video-list';
 import type { UploadedImage } from '@/types/upload';
 import type { Video } from '@/types/video';
-import { process } from '@/actions/App/Http/Controllers/VideoGenerationController';
+import { process } from '@/routes/video/generate';
 
 type Props = {
     videos: Video[];

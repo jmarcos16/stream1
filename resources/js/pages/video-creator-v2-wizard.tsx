@@ -6,16 +6,24 @@ import { StepIndicator } from '@/components/wizard/StepIndicator';
 import { MediaAssetsStep } from '@/components/wizard/steps/MediaAssetsStep';
 import { VideoScriptStep } from '@/components/wizard/steps/VideoScriptStep';
 import { GenerationSettingsStep } from '@/components/wizard/steps/GenerationSettingsStep';
-import { v2 } from '@/actions/App/Http/Controllers/VideoCreatorController';
 import { Video } from '@/types/video';
+import { v2 } from '@/routes/video-creator';
+
+type UploadedFile = {
+    id: string;
+    name: string;
+    path: string;
+    url: string;
+};
 
 type Props = {
     video: Video;
+    existingImages: UploadedFile[];
 };
 
-export default function VideoCreatorV2Wizard({ video }: Props) {
+export default function VideoCreatorV2Wizard({ video, existingImages }: Props) {
     const [currentStep, setCurrentStep] = useState(1);
-
+    
     const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
     const handleBack = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
@@ -42,9 +50,9 @@ export default function VideoCreatorV2Wizard({ video }: Props) {
 
                 <StepIndicator currentStep={currentStep} />
 
-                {currentStep === 1 && <MediaAssetsStep video={video} onNext={handleNext} />}
+                {currentStep === 1 && <MediaAssetsStep video={video} existingImages={existingImages} onNext={handleNext} />}
                 {currentStep === 2 && (
-                    <VideoScriptStep onNext={handleNext} onBack={handleBack} />
+                    <VideoScriptStep video={video} onNext={handleNext} onBack={handleBack} />
                 )}
                 {currentStep === 3 && (
                     <GenerationSettingsStep onBack={handleBack} />

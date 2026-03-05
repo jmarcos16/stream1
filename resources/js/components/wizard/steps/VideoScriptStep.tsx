@@ -5,15 +5,37 @@ import {
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { Video } from '@/types/video';
+import { router } from '@inertiajs/react';
+import { update } from '@/routes/video/script';
+import debounce from 'lodash.debounce';
 
 type Props = {
+    video: Video;
     onNext: () => void;
     onBack: () => void;
 };
 
-export function VideoScriptStep({ onNext, onBack }: Props) {
-    const [script, setScript] = useState('');
+export function VideoScriptStep({ video, onNext, onBack }: Props) {
+    const [script, setScript] = useState(video.script || '');
+
+    const saveScript = useCallback(
+        debounce((value: string) => {
+            router.patch(update({ video: video.id }), { script: value }, { preserveScroll: true });
+        }, 2000),
+        [video.id]
+    );
+
+    const handleChange = (value: string) => {
+        setScript(value);
+        saveScript(value);
+    };
+
+    const handleBlur = () => {
+        saveScript.cancel();
+        router.patch(update({ video: video.id }), { script }, { preserveScroll: true });
+    };
 
     return (
         <div className="flex min-h-125 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -48,7 +70,8 @@ export function VideoScriptStep({ onNext, onBack }: Props) {
                     className="w-full flex-1 resize-none rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                     placeholder="Write your complete video script here..."
                     value={script}
-                    onChange={(e) => setScript(e.target.value)}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
                 />
             </div>
 

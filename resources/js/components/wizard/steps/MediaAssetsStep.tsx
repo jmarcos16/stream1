@@ -1,25 +1,27 @@
 import { Upload, ImagePlus, ChevronLeft, ChevronRight, X, Loader2 } from 'lucide-react';
 import { v2 } from '@/routes/video-creator';
-import { upload } from '@/actions/App/Http/Controllers/MediaUploadController';
+import { upload } from '@/routes/media';
+import { deleteMethod } from '@/routes/media';
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { Video } from '@/types/video';
 
-type Props = {
-    video: Video;
-    onNext: () => void;
-};
-
 type UploadedFile = {
     id: string;
     name: string;
+    path: string;
     url: string;
-    size: number;
 };
 
-export function MediaAssetsStep({ video, onNext }: Props) {
+type Props = {
+    video: Video;
+    existingImages: UploadedFile[];
+    onNext: () => void;
+};
+
+export function MediaAssetsStep({ video, existingImages, onNext }: Props) {
     const [uploading, setUploading] = useState(false);
-    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>(existingImages);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -29,7 +31,7 @@ export function MediaAssetsStep({ video, onNext }: Props) {
         const formData = new FormData();
         Array.from(files).forEach(file => formData.append('files[]', file));
 
-        router.post(upload.url({ video: video.id }), formData, {
+        router.post(upload({ video: video.id }), formData, {
             onSuccess: (page) => {
                 const uploaded = page.props.uploadedFiles as UploadedFile[];
                 setUploadedFiles(prev => [...prev, ...uploaded]);
@@ -39,8 +41,12 @@ export function MediaAssetsStep({ video, onNext }: Props) {
         });
     };
 
-    const removeFile = (id: string) => {
-        setUploadedFiles(prev => prev.filter(f => f.id !== id));
+    const removeFile = (file: UploadedFile) => {
+        router.delete(deleteMethod({ video: video.id, filename: file.id }), {
+            onSuccess: () => {
+                setUploadedFiles(prev => prev.filter(f => f.id !== file.id));
+            },
+        });
     };
 
     return (
@@ -71,7 +77,7 @@ export function MediaAssetsStep({ video, onNext }: Props) {
                             <div key={file.id} className="group relative aspect-square overflow-hidden rounded-lg border border-slate-200">
                                 <img src={file.url} alt={file.name} className="h-full w-full object-cover" />
                                 <button
-                                    onClick={() => removeFile(file.id)}
+                                    onClick={() => removeFile(file)}
                                     className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
                                 >
                                     <X className="size-4" />
