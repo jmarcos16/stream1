@@ -57,7 +57,8 @@ export default function VideoList({ videos }: VideoListProps) {
                                     </h3>
                                     <p className="mt-1 text-sm text-[#92b7c9]">
                                         {video.script?.substring(0, 100)}
-                                        {video.script && video.script.length > 100
+                                        {video.script &&
+                                        video.script.length > 100
                                             ? '...'
                                             : ''}
                                     </p>

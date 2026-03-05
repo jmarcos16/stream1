@@ -11,6 +11,7 @@ use App\Models\Video;
 use App\VideoStatus;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
+
 final class VideoGenerationController extends Controller
 {
     public function process(StoreVideoProjectRequest $request)

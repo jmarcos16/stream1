@@ -12,11 +12,11 @@ export function DashboardV2Layout({ children, title }: Props) {
     return (
         <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-white font-sans text-slate-900">
             {title && <Head title={title} />}
-            
+
             <DashboardHeader />
 
-            <main className="flex-1 px-6 lg:px-20 py-10 bg-[#f9fafb]">
-                <div className="max-w-6xl mx-auto flex flex-col gap-10">
+            <main className="flex-1 bg-[#f9fafb] px-6 py-10 lg:px-20">
+                <div className="mx-auto flex max-w-6xl flex-col gap-10">
                     {children}
                 </div>
             </main>

@@ -18,9 +18,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             \App\Services\Audio\AudioGeneratorInterface::class,
             fn () => match (config('services.audio_generator')) {
-                'openai' => new \App\Services\Audio\OpenAiAudioGenerator(),
-                'elevenlabs' => new \App\Services\Audio\ElevenLabsAudioGenerator(),
-                default => new \App\Services\Audio\ElevenLabsAudioGenerator(),
+                'openai' => new \App\Services\Audio\OpenAiAudioGenerator,
+                'elevenlabs' => new \App\Services\Audio\ElevenLabsAudioGenerator,
+                default => new \App\Services\Audio\ElevenLabsAudioGenerator,
             }
         );
 

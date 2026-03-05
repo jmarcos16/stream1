@@ -2,10 +2,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function AppHeader() {
     return (
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#27272a] px-6 py-3 shrink-0 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-10">
+        <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-solid border-[#27272a] bg-[#09090b]/80 px-6 py-3 whitespace-nowrap backdrop-blur-md">
             <div className="flex items-center gap-4 text-white">
                 <div className="size-6">
-                    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                        fill="none"
+                        viewBox="0 0 48 48"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
                         <path
                             clipRule="evenodd"
                             d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z"
@@ -20,13 +24,16 @@ export function AppHeader() {
                         />
                     </svg>
                 </div>
-                <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+                <h2 className="text-lg leading-tight font-bold tracking-[-0.015em] text-white">
                     VidGen AI
                 </h2>
             </div>
             <div className="flex flex-1 justify-end gap-8">
                 <Avatar className="size-10">
-                    <AvatarImage src="https://lh3.googleusercontent.com/aida-public/AB6AXuApW4AAMwr0mtyyei9kJd4hHJwZtCW3THoHe_1YJoP4tC6CxLJhFk--ub8GzEGvIc6OKsIsT7PxyTCDIBydvDyEFvF6xmUuwVwmapQE46yS1Uye7QeAVJQ6feWDXUvd3AiZmZGormsRgMb7HbHMYsqJF7PXykCekfRlv7K_FRp0NowQO_0Or-cSb5zorjEplzbuFlQ0nFirACKWXGbzAkFUI95yOJ9XDuGklW3Qg3w8wcJtHeL0tceirXJgIbeZCP_Z2_voX1tLv6g" alt="User profile" />
+                    <AvatarImage
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuApW4AAMwr0mtyyei9kJd4hHJwZtCW3THoHe_1YJoP4tC6CxLJhFk--ub8GzEGvIc6OKsIsT7PxyTCDIBydvDyEFvF6xmUuwVwmapQE46yS1Uye7QeAVJQ6feWDXUvd3AiZmZGormsRgMb7HbHMYsqJF7PXykCekfRlv7K_FRp0NowQO_0Or-cSb5zorjEplzbuFlQ0nFirACKWXGbzAkFUI95yOJ9XDuGklW3Qg3w8wcJtHeL0tceirXJgIbeZCP_Z2_voX1tLv6g"
+                        alt="User profile"
+                    />
                     <AvatarFallback>U</AvatarFallback>
                 </Avatar>
             </div>

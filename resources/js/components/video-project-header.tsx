@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { Check, X, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
 
 type VideoProjectHeaderProps = {
@@ -50,11 +55,7 @@ export default function VideoProjectHeader({
                     autoFocus
                 />
                 <div className="flex gap-2">
-                    <Button
-                        onClick={handleSave}
-                        size="sm"
-                        className="gap-2"
-                    >
+                    <Button onClick={handleSave} size="sm" className="gap-2">
                         <Check className="h-4 w-4" />
                         Save
                     </Button>
@@ -77,11 +78,11 @@ export default function VideoProjectHeader({
         <>
             <div className="p-6">
                 <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                        <h1 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground mb-1">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="mb-1 text-sm font-semibold tracking-wide text-muted-foreground uppercase">
                             Video Project
                         </h1>
-                        <p className="text-lg font-semibold text-foreground truncate">
+                        <p className="truncate text-lg font-semibold text-foreground">
                             {title}
                         </p>
                     </div>
@@ -92,7 +93,7 @@ export default function VideoProjectHeader({
                                     onClick={() => setIsEditing(true)}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 p-0 shrink-0"
+                                    className="h-8 w-8 shrink-0 p-0"
                                 >
                                     <Pencil className="h-4 w-4" />
                                 </Button>

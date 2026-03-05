@@ -11,7 +11,9 @@ type Props = {
 };
 
 export function DashboardTabs({ currentStatus = 'all' }: Props) {
-    const [activeTab, setActiveTab] = useState<TabType>((currentStatus as TabType) || 'all');
+    const [activeTab, setActiveTab] = useState<TabType>(
+        (currentStatus as TabType) || 'all',
+    );
 
     const tabs: { id: TabType; label: string }[] = [
         { id: 'all', label: 'All Videos' },
@@ -35,8 +37,8 @@ export function DashboardTabs({ currentStatus = 'all' }: Props) {
     };
 
     return (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200">
-            <nav className="flex gap-8 overflow-x-auto hide-scrollbar">
+        <div className="flex flex-col justify-between gap-4 border-b border-slate-200 sm:flex-row sm:items-center">
+            <nav className="flex hide-scrollbar gap-8 overflow-x-auto">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
@@ -49,13 +51,16 @@ export function DashboardTabs({ currentStatus = 'all' }: Props) {
                     >
                         {tab.label}
                         {activeTab === tab.id && (
-                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 rounded-t-full"></span>
+                            <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-t-full bg-indigo-500"></span>
                         )}
                     </button>
                 ))}
             </nav>
             <div className="flex items-center gap-2">
-                <button onClick={handleNewProject} className="mb-3 flex items-center justify-center gap-2 bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-indigo-500/30 transition-all active:scale-95">
+                <button
+                    onClick={handleNewProject}
+                    className="mb-3 flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95"
+                >
                     <Plus className="size-5" />
                     New Project
                 </button>

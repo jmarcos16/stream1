@@ -4,17 +4,35 @@ type Props = {
 
 export function StepIndicator({ currentStep }: Props) {
     return (
-        <nav className="flex border-b border-slate-200 mb-8 gap-8 overflow-x-auto hide-scrollbar">
-            <div className={`pb-4 text-sm flex items-center gap-2 whitespace-nowrap border-b-2 ${currentStep === 1 ? 'font-bold border-indigo-500 text-indigo-500' : 'font-medium border-transparent text-slate-500'}`}>
-                <span className={`size-6 rounded-full flex items-center justify-center text-[10px] ${currentStep === 1 ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}`}>1</span>
+        <nav className="mb-8 flex hide-scrollbar gap-8 overflow-x-auto border-b border-slate-200">
+            <div
+                className={`flex items-center gap-2 border-b-2 pb-4 text-sm whitespace-nowrap ${currentStep === 1 ? 'border-indigo-500 font-bold text-indigo-500' : 'border-transparent font-medium text-slate-500'}`}
+            >
+                <span
+                    className={`flex size-6 items-center justify-center rounded-full text-[10px] ${currentStep === 1 ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}`}
+                >
+                    1
+                </span>
                 Media Assets
             </div>
-            <div className={`pb-4 text-sm flex items-center gap-2 whitespace-nowrap border-b-2 ${currentStep === 2 ? 'font-bold border-indigo-500 text-indigo-500' : 'font-medium border-transparent text-slate-500'}`}>
-                <span className={`size-6 rounded-full flex items-center justify-center text-[10px] ${currentStep === 2 ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}`}>2</span>
+            <div
+                className={`flex items-center gap-2 border-b-2 pb-4 text-sm whitespace-nowrap ${currentStep === 2 ? 'border-indigo-500 font-bold text-indigo-500' : 'border-transparent font-medium text-slate-500'}`}
+            >
+                <span
+                    className={`flex size-6 items-center justify-center rounded-full text-[10px] ${currentStep === 2 ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}`}
+                >
+                    2
+                </span>
                 Video Script
             </div>
-            <div className={`pb-4 text-sm flex items-center gap-2 whitespace-nowrap border-b-2 ${currentStep === 3 ? 'font-bold border-indigo-500 text-indigo-500' : 'font-medium border-transparent text-slate-500'}`}>
-                <span className={`size-6 rounded-full flex items-center justify-center text-[10px] ${currentStep === 3 ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}`}>3</span>
+            <div
+                className={`flex items-center gap-2 border-b-2 pb-4 text-sm whitespace-nowrap ${currentStep === 3 ? 'border-indigo-500 font-bold text-indigo-500' : 'border-transparent font-medium text-slate-500'}`}
+            >
+                <span
+                    className={`flex size-6 items-center justify-center rounded-full text-[10px] ${currentStep === 3 ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}`}
+                >
+                    3
+                </span>
                 Generation Settings
             </div>
         </nav>

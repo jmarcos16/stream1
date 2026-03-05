@@ -5,9 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import type { AppLayoutProps } from '@/types';
 import { Fragment } from 'react/jsx-runtime';
 
-export default function AppHeaderLayout({
-    children,
-}: AppLayoutProps) {
+export default function AppHeaderLayout({ children }: AppLayoutProps) {
     return (
         <Fragment>
             <AppShell>
