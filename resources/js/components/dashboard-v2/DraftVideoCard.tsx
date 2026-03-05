@@ -1,6 +1,7 @@
 import { Edit, Play } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 import type { Video } from '@/types/video';
-import edit from '@/actions/App/Http/Controllers/Video/EditVideoDraftController';
+import { edit } from '@/routes/video-creator/v2';
 
 type Props = {
     video: Video;
@@ -37,13 +38,13 @@ export function DraftVideoCard({ video }: Props) {
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <a
+                        <Link
                             href={edit({ video: video.id })}
                             className="flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 transition-all hover:bg-white hover:shadow-sm"
                         >
                             <Edit className="size-4 text-slate-500" />
                             Edit
-                        </a>
+                        </Link>
                         {canGenerate && (
                             <button className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-500/10 transition-all hover:bg-indigo-600">
                                 <Play className="size-4" />

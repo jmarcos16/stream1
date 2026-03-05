@@ -7,8 +7,13 @@ import { MediaAssetsStep } from '@/components/wizard/steps/MediaAssetsStep';
 import { VideoScriptStep } from '@/components/wizard/steps/VideoScriptStep';
 import { GenerationSettingsStep } from '@/components/wizard/steps/GenerationSettingsStep';
 import { v2 } from '@/actions/App/Http/Controllers/VideoCreatorController';
+import { Video } from '@/types/video';
 
-export default function VideoCreatorV2Wizard() {
+type Props = {
+    video: Video;
+};
+
+export default function VideoCreatorV2Wizard({ video }: Props) {
     const [currentStep, setCurrentStep] = useState(1);
 
     const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
@@ -37,7 +42,7 @@ export default function VideoCreatorV2Wizard() {
 
                 <StepIndicator currentStep={currentStep} />
 
-                {currentStep === 1 && <MediaAssetsStep onNext={handleNext} />}
+                {currentStep === 1 && <MediaAssetsStep video={video} onNext={handleNext} />}
                 {currentStep === 2 && (
                     <VideoScriptStep onNext={handleNext} onBack={handleBack} />
                 )}

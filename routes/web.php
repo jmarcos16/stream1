@@ -25,7 +25,7 @@ Route::get('v2/video-creator/{video}/edit', EditVideoDraftController::class)
 Route::post('video/generate', [\App\Http\Controllers\VideoGenerationController::class, 'process'])
     ->name('video.generate');
 
-Route::post('media/upload', [MediaUploadController::class, 'upload'])
+Route::post('videos/{video}/media/upload', [MediaUploadController::class, 'upload'])
     ->name('media.upload');
 
 require __DIR__.'/settings.php';

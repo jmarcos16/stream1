@@ -253,8 +253,10 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 Wayfinder generates TypeScript functions for Laravel routes. Import from `@/actions/` (controllers) or `@/routes/` (named routes).
 
+- CRITICAL: ALWAYS use Wayfinder for ALL route references in frontend code. Never use hardcoded strings like '/media/upload'.
 - IMPORTANT: Activate `wayfinder-development` skill whenever referencing backend routes in frontend components.
 - Invokable Controllers: `import StorePost from '@/actions/.../StorePostController'; StorePost()`.
+- Named Routes: `import { mediaUpload } from '@/routes/media'; mediaUpload()`.
 - Parameter Binding: Detects route keys (`{post:slug}`) — `show({ slug: "my-post" })`.
 - Query Merging: `show(1, { mergeQuery: { page: 2, sort: null } })` merges with current URL, `null` removes params.
 - Inertia: Use `.form()` with `<Form>` component or `form.submit(store())` with useForm.
