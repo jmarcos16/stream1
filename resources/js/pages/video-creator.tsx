@@ -4,6 +4,12 @@ export default function VideoCreator() {
     return (
         <>
             <Head title="ShortsGen - Video Creator" />
+            <style>{`
+                @keyframes rotate-border {
+                    0% { stroke-dashoffset: 0; }
+                    100% { stroke-dashoffset: -400; }
+                }
+            `}</style>
             
             <div className="min-h-screen flex flex-col bg-[#020617] text-slate-100 antialiased">
                 {/* Navigation */}
@@ -41,10 +47,31 @@ export default function VideoCreator() {
                             <button className="px-5 py-2 rounded-xl text-sm font-medium bg-slate-900 border border-slate-800 hover:bg-slate-800 transition-colors">
                                 Save Draft
                             </button>
-                            <button className="bg-gradient-to-br from-[#5555f6] to-[#ec4899] px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-[#5555f6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
-                                <span className="material-symbols-outlined text-lg">bolt</span>
-                                Generate Video
-                            </button>
+                            <div className="relative">
+                                <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+                                    <defs>
+                                        <linearGradient id="gradient-btn" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stopColor="#5555f6" />
+                                            <stop offset="50%" stopColor="#ec4899" />
+                                            <stop offset="100%" stopColor="#5555f6" />
+                                        </linearGradient>
+                                    </defs>
+                                    <rect
+                                        x="1" y="1"
+                                        width="calc(100% - 2px)" height="calc(100% - 2px)"
+                                        rx="12" ry="12"
+                                        fill="none"
+                                        stroke="url(#gradient-btn)"
+                                        strokeWidth="2"
+                                        strokeDasharray="100 300"
+                                        style={{ animation: 'rotate-border 3s linear infinite' }}
+                                    />
+                                </svg>
+                                <button className="relative bg-gradient-to-br from-[#5555f6] to-[#ec4899] px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-[#5555f6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-lg">bolt</span>
+                                    Generate Video
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -138,12 +165,33 @@ export default function VideoCreator() {
                                 <span className="material-symbols-outlined text-slate-400 text-xl">visibility</span>
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Preview</h3>
                             </div>
-                            <div className="aspect-[9/16] bg-slate-900/60 border border-slate-800 rounded-3xl overflow-hidden shadow-[0_0_40px_-10px_rgba(85,85,246,0.2)] flex items-center justify-center">
-                                <div className="text-center space-y-3">
-                                    <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto">
-                                        <span className="material-symbols-outlined text-slate-600 text-3xl">play_circle</span>
+                            <div className="relative">
+                                <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+                                    <defs>
+                                        <linearGradient id="gradient-preview" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stopColor="#5555f6" />
+                                            <stop offset="50%" stopColor="#ec4899" />
+                                            <stop offset="100%" stopColor="#5555f6" />
+                                        </linearGradient>
+                                    </defs>
+                                    <rect
+                                        x="2" y="2"
+                                        width="calc(100% - 4px)" height="calc(100% - 4px)"
+                                        rx="24" ry="24"
+                                        fill="none"
+                                        stroke="url(#gradient-preview)"
+                                        strokeWidth="2"
+                                        strokeDasharray="150 350"
+                                        style={{ animation: 'rotate-border 4s linear infinite' }}
+                                    />
+                                </svg>
+                                <div className="relative aspect-[9/16] bg-slate-900/60 border border-slate-800 rounded-3xl overflow-hidden shadow-[0_0_40px_-10px_rgba(85,85,246,0.2)] flex items-center justify-center">
+                                    <div className="text-center space-y-3">
+                                        <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto">
+                                            <span className="material-symbols-outlined text-slate-600 text-3xl">play_circle</span>
+                                        </div>
+                                        <p className="text-sm text-slate-500">Preview will appear here</p>
                                     </div>
-                                    <p className="text-sm text-slate-500">Preview will appear here</p>
                                 </div>
                             </div>
                         </div>
