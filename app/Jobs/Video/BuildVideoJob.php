@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Video;
 
+use App\Events\VideoProcessingUpdated;
 use App\Models\Video;
 use App\VideoStatus;
 use Exception;
@@ -48,6 +49,8 @@ class BuildVideoJob implements ShouldQueue
     {
         $this->video->update(['status' => VideoStatus::PROCESSING]);
 
+        VideoProcessingUpdated::dispatch($this->video->id, 'video', 'processing');
+
         $this->video->refresh();
 
         $images = $this->getImages();
@@ -83,6 +86,8 @@ class BuildVideoJob implements ShouldQueue
                 'status' => VideoStatus::COMPLETED,
                 'raw_video_path' => 'videos/'.$this->video->id.'/raw_video.mp4',
             ]);
+
+            VideoProcessingUpdated::dispatch($this->video->id, 'video', 'completed');
         } finally {
             File::deleteDirectory($tempDir);
         }

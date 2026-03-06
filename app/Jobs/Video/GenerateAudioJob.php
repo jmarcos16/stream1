@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Video;
 
+use App\Events\VideoProcessingUpdated;
 use App\Models\Video;
 use App\Services\Audio\AudioGeneratorInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,6 +22,8 @@ class GenerateAudioJob implements ShouldQueue
         $this->video->refresh();
         $this->video->update(['status' => \App\VideoStatus::PROCESSING]);
 
+        VideoProcessingUpdated::dispatch($this->video->id, 'audio', 'processing');
+
         $path = "videos/{$this->video->id}/audio.mp3";
         $savedPath = $audioGenerator->generate($this->video->script, $path);
 
@@ -30,6 +33,8 @@ class GenerateAudioJob implements ShouldQueue
             'audio_path' => $savedPath,
             'audio_duration' => $duration,
         ]);
+
+        VideoProcessingUpdated::dispatch($this->video->id, 'audio', 'completed');
     }
 
     private function getAudioDuration(string $path): float

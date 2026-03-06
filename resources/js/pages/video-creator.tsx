@@ -1,9 +1,10 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { useCallback, useRef, useState } from 'react';
 import { generate } from '@/routes/video';
 import { store as uploadMedia } from '@/routes/temp-media';
 import { destroy as deleteMedia } from '@/routes/temp-media';
 import MediaThumbnails from '@/components/media-thumbnails';
+import VideoProcessingPreview from '@/components/video-processing-preview';
 import axios from 'axios';
 
 type UploadedImage = {
@@ -14,8 +15,10 @@ type UploadedImage = {
 };
 
 export default function VideoCreator() {
+    const { processingVideoId } = usePage<{ processingVideoId?: number }>().props;
     const [images, setImages] = useState<UploadedImage[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [activeVideoId, setActiveVideoId] = useState<number | null>(processingVideoId ?? null);
 
     const form = useForm({
         title: '',
@@ -79,7 +82,13 @@ export default function VideoCreator() {
     const handleSubmit = () => {
         const validPaths = images.filter(img => !img.uploading).map(img => img.path);
         form.transform(data => ({ ...data, images: validPaths }));
-        form.post(generate().url);
+        form.post(generate().url, {
+            onSuccess: (page) => {
+                const url = new URL(page.url, window.location.origin);
+                const id = url.searchParams.get('processingVideoId');
+                if (id) setActiveVideoId(Number(id));
+            },
+        });
     };
 
     return (
@@ -272,12 +281,7 @@ export default function VideoCreator() {
                                     <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)" rx="24" ry="24" fill="none" stroke="url(#gradient-preview)" strokeWidth="2" strokeDasharray="150 350" style={{ animation: 'rotate-border 4s linear infinite' }} />
                                 </svg>
                                 <div className="relative aspect-[9/16] bg-slate-900/60 border border-slate-800 rounded-3xl overflow-hidden shadow-[0_0_40px_-10px_rgba(85,85,246,0.2)] flex items-center justify-center">
-                                    <div className="text-center space-y-3">
-                                        <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto">
-                                            <span className="material-symbols-outlined text-slate-600 text-3xl">play_circle</span>
-                                        </div>
-                                        <p className="text-sm text-slate-500">Preview will appear here</p>
-                                    </div>
+                                    <VideoProcessingPreview videoId={activeVideoId} />
                                 </div>
                             </div>
                         </div>

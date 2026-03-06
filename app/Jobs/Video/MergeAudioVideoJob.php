@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Video;
 
+use App\Events\VideoProcessingUpdated;
 use App\Models\Video;
 use App\VideoStatus;
 use Exception;
@@ -26,6 +27,8 @@ class MergeAudioVideoJob implements ShouldQueue
     {
         $this->video->refresh();
         $this->video->update(['status' => VideoStatus::PROCESSING]);
+
+        VideoProcessingUpdated::dispatch($this->video->id, 'merge', 'processing');
 
         $audioPath = Storage::disk('public')->path($this->video->audio_path);
         $videoPath = Storage::disk('public')->path($this->video->raw_video_path);
@@ -61,8 +64,15 @@ class MergeAudioVideoJob implements ShouldQueue
         }
 
         $this->video->update([
-            'status' => VideoStatus::PROCESSING,
+            'status' => VideoStatus::COMPLETED,
             'video_path' => 'videos/'.$this->video->id.'/final_video.mp4',
         ]);
+
+        VideoProcessingUpdated::dispatch(
+            $this->video->id,
+            'merge',
+            'completed',
+            Storage::disk('public')->url('videos/'.$this->video->id.'/final_video.mp4'),
+        );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\VideoProcessingUpdated;
 use App\Http\Requests\StoreVideoProjectRequest;
 use App\Jobs\Video\AddSubtitlesJob;
 use App\Jobs\Video\BuildVideoJob;
@@ -33,11 +34,11 @@ final class VideoGenerationController extends Controller
         ])
             ->catch(function (\Throwable $e) use ($video) {
                 $video->update(['status' => VideoStatus::FAILED]);
-                // before implementing the broadcast event with reverb
+                VideoProcessingUpdated::dispatch($video->id, 'error', 'failed');
             })
             ->dispatch();
 
-        return to_route('video-creator');
+        return to_route('video-creator', ['processingVideoId' => $video->id]);
     }
 
     /**
