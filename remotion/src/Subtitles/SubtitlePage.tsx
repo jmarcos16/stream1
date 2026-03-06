@@ -14,12 +14,16 @@ export function SubtitlePage({ page, style = 'bottom' }: { page: TikTokPage; sty
         durationInFrames: 5,
     });
 
-    const positionStyle = style === 'center' 
-        ? { justifyContent: 'center', alignItems: 'center', height: 200 }
-        : { justifyContent: 'center', alignItems: 'center', top: undefined, bottom: 350, height: 150 };
+    if (style === 'center') {
+        return (
+            <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Page enterProgress={enter} page={page} style={style} />
+            </AbsoluteFill>
+        );
+    }
 
     return (
-        <AbsoluteFill style={positionStyle}>
+        <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', top: undefined, bottom: 350, height: 150 }}>
             <Page enterProgress={enter} page={page} style={style} />
         </AbsoluteFill>
     );

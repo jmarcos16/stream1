@@ -28,6 +28,7 @@ export function RemotionRoot() {
                 fps: FPS,
                 width: WIDTH,
                 height: HEIGHT,
+                style: "bottom",
             }}
         />
     );

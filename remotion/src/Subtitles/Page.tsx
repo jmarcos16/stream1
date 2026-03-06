@@ -33,8 +33,7 @@ export function Page({
 
     // Para o estilo center, dividir em duas linhas
     if (style === 'center') {
-        const words = page.tokens.map(t => t.text.trim());
-        const midPoint = Math.ceil(words.length / 2);
+        const midPoint = Math.ceil(page.tokens.length / 2);
         const firstLine = page.tokens.slice(0, midPoint);
         const secondLine = page.tokens.slice(midPoint);
 
@@ -48,7 +47,7 @@ export function Page({
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: fontSize * 0.2,
+                    gap: fontSize * 0.3,
                     transform: makeTransform([
                         scale(interpolate(enterProgress, [0, 1], [0.8, 1])),
                         translateY(interpolate(enterProgress, [0, 1], [50, 0])),
@@ -56,7 +55,7 @@ export function Page({
                     opacity: enterProgress,
                 }}
             >
-                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: fontSize * 0.15 }}>
+                <div style={{ display: "flex", flexWrap: "nowrap", justifyContent: "center", gap: fontSize * 0.15 }}>
                     {firstLine.map((t, i) => {
                         const active =
                             t.fromMs - page.startMs <= timeInMs &&
@@ -73,13 +72,13 @@ export function Page({
                         };
 
                         return (
-                            <span key={`${t.text}-${i}`} style={wordStyle}>
+                            <span key={`first-${t.text}-${i}`} style={wordStyle}>
                                 {t.text.trim()}
                             </span>
                         );
                     })}
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: fontSize * 0.15 }}>
+                <div style={{ display: "flex", flexWrap: "nowrap", justifyContent: "center", gap: fontSize * 0.15 }}>
                     {secondLine.map((t, i) => {
                         const active =
                             t.fromMs - page.startMs <= timeInMs &&
@@ -96,7 +95,7 @@ export function Page({
                         };
 
                         return (
-                            <span key={`${t.text}-${i}`} style={wordStyle}>
+                            <span key={`second-${t.text}-${i}`} style={wordStyle}>
                                 {t.text.trim()}
                             </span>
                         );

@@ -38,7 +38,6 @@ if (!fs.existsSync(fontDest)) {
 
 const entryPoint = path.resolve(import.meta.dirname, "src/index.ts");
 
-console.log("Bundling Remotion composition...");
 const bundled = await bundle({ entryPoint, publicDir: videoDir });
 
 const inputProps = {
@@ -62,8 +61,6 @@ composition.durationInFrames = durationInFrames;
 composition.fps = FPS;
 composition.width = WIDTH;
 composition.height = HEIGHT;
-
-console.log(`Rendering ${durationInFrames} frames...`);
 
 await renderMedia({
     composition,
