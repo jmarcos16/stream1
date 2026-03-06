@@ -48,7 +48,7 @@ test('it generates word timestamps from audio', function () {
     expect($publicDisk->exists('videos/'.$video->id.'/words.json'))->toBeTrue();
 
     $savedWords = json_decode($publicDisk->get('videos/'.$video->id.'/words.json'), true);
-    expect($savedWords)->toBe($expectedWords);
+    expect($savedWords)->toEqual($expectedWords);
 });
 
 test('it throws exception when audio file is missing', function () {
