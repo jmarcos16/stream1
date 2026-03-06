@@ -24,27 +24,27 @@ class CleanupVideoFilesJob implements ShouldQueue
     {
         $this->video->refresh();
 
-        $localDisk = Storage::disk('local');
+        $publicDisk = Storage::disk('public');
 
         if ($this->video->audio_path) {
-            $localDisk->delete($this->video->audio_path);
+            $publicDisk->delete($this->video->audio_path);
         }
 
         if ($this->video->raw_video_path) {
-            $localDisk->delete($this->video->raw_video_path);
+            $publicDisk->delete($this->video->raw_video_path);
         }
 
         if ($this->video->srt_path) {
-            $localDisk->delete($this->video->srt_path);
+            $publicDisk->delete($this->video->srt_path);
         }
 
-        $tempDir = $localDisk->path('videos/temp/'.$this->video->id);
+        $tempDir = $publicDisk->path('videos/'.$this->video->id.'/temp');
 
         if (is_dir($tempDir)) {
             File::deleteDirectory($tempDir);
         }
 
-        $imagesDir = storage_path('app/public/images/'.$this->video->id);
+        $imagesDir = $publicDisk->path('videos/'.$this->video->id.'/images');
 
         if (is_dir($imagesDir)) {
             File::deleteDirectory($imagesDir);

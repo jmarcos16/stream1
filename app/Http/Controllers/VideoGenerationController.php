@@ -25,9 +25,9 @@ final class VideoGenerationController extends Controller
         $this->moveImagesToVideoFolder($video, $request->input('images'));
 
         Bus::chain([
-            // new GenerateAudioJob($video),
-            // new BuildVideoJob($video),
-            // new MergeAudioVideoJob($video),
+            new GenerateAudioJob($video),
+            new BuildVideoJob($video),
+            new MergeAudioVideoJob($video),
             // new AddSubtitlesJob($video),
             // new CleanupVideoFilesJob($video),desativar por enquanto para manter os arquivos para debug
         ])
@@ -41,6 +41,8 @@ final class VideoGenerationController extends Controller
     }
 
     /**
+     * Move uploaded images from temporary storage to the video's dedicated folder, renaming them in order.
+     *
      * @param  list<string>  $imagePaths
      */
     private function moveImagesToVideoFolder(Video $video, array $imagePaths): void
@@ -53,8 +55,9 @@ final class VideoGenerationController extends Controller
             }
 
             $extension = pathinfo($path, PATHINFO_EXTENSION);
-            $orderedName = str_pad((string) $index, 3, '0', STR_PAD_LEFT).'.'.$extension;
-            $destination = 'images/'.$video->id.'/'.$orderedName;
+            $fileNumber = $index + 1;
+            $orderedName = str_pad((string) $fileNumber, 3, '0', STR_PAD_LEFT)."_foto{$fileNumber}.{$extension}";
+            $destination = "videos/{$video->id}/images/{$orderedName}";
 
             $publicDisk->move($path, $destination);
         }

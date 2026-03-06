@@ -21,7 +21,7 @@ class GenerateAudioJob implements ShouldQueue
         $this->video->refresh();
         $this->video->update(['status' => \App\VideoStatus::PROCESSING]);
 
-        $path = 'audio/'.$this->video->id.'_'.uniqid().'.mp3';
+        $path = "videos/{$this->video->id}/audio.mp3";
         $savedPath = $audioGenerator->generate($this->video->script, $path);
 
         $duration = $this->getAudioDuration($savedPath);
@@ -34,7 +34,7 @@ class GenerateAudioJob implements ShouldQueue
 
     private function getAudioDuration(string $path): float
     {
-        $fullPath = Storage::disk('local')->path($path);
+        $fullPath = Storage::disk('public')->path($path);
 
         $process = new \Symfony\Component\Process\Process([
             'ffprobe', '-v', 'error',

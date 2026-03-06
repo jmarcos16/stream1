@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import { generate } from '@/routes/video';
 import { store as uploadMedia } from '@/routes/temp-media';
 import { destroy as deleteMedia } from '@/routes/temp-media';
+import MediaThumbnails from '@/components/media-thumbnails';
 import axios from 'axios';
 
 type UploadedImage = {
@@ -14,8 +15,6 @@ type UploadedImage = {
 
 export default function VideoCreator() {
     const [images, setImages] = useState<UploadedImage[]>([]);
-    const [dragIndex, setDragIndex] = useState<number | null>(null);
-    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm({
@@ -62,23 +61,14 @@ export default function VideoCreator() {
         setImages(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleDragStart = (index: number) => setDragIndex(index);
-    const handleDragOver = (e: React.DragEvent, index: number) => {
-        e.preventDefault();
-        setDragOverIndex(index);
-    };
-    const handleDrop = (index: number) => {
-        if (dragIndex === null || dragIndex === index) return;
+    const reorderImages = (from: number, to: number) => {
         setImages(prev => {
             const updated = [...prev];
-            const [moved] = updated.splice(dragIndex, 1);
-            updated.splice(index, 0, moved);
+            const [moved] = updated.splice(from, 1);
+            updated.splice(to, 0, moved);
             return updated;
         });
-        setDragIndex(null);
-        setDragOverIndex(null);
     };
-    const handleDragEnd = () => { setDragIndex(null); setDragOverIndex(null); };
 
     const handleDropZone = (e: React.DragEvent) => {
         e.preventDefault();
@@ -141,9 +131,10 @@ export default function VideoCreator() {
                                 type="text"
                                 value={form.data.title}
                                 onChange={e => form.setData('title', e.target.value)}
-                                className="text-2xl font-bold bg-transparent border-none outline-none placeholder:text-slate-600 w-full"
+                                className={`text-2xl font-bold bg-transparent border-none outline-none placeholder:text-slate-600 w-full ${form.errors.title ? 'text-red-400' : ''}`}
                                 placeholder="Untitled Project"
                             />
+                            {form.errors.title && <p className="text-xs text-red-400 mt-1">{form.errors.title}</p>}
                             <p className="text-slate-500 text-sm">Transform your ideas into vertical magic</p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -198,38 +189,7 @@ export default function VideoCreator() {
                                     <p className="text-[11px] text-slate-500 mt-1">Up to 10 images • 9:16 recommended</p>
                                 </div>
                                 {images.length > 0 && (
-                                    <div className="flex gap-3 overflow-x-auto pb-2">
-                                        {images.map((image, i) => (
-                                            <div
-                                                key={image.path || i}
-                                                draggable={!image.uploading}
-                                                onDragStart={() => handleDragStart(i)}
-                                                onDragOver={e => handleDragOver(e, i)}
-                                                onDrop={() => handleDrop(i)}
-                                                onDragEnd={handleDragEnd}
-                                                className={`relative w-16 h-24 rounded-lg border shrink-0 overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
-                                                    dragOverIndex === i ? 'border-[#5555f6] scale-105' : 'border-slate-800'
-                                                } ${dragIndex === i ? 'opacity-40' : ''}`}
-                                            >
-                                                {image.uploading ? (
-                                                    <div className="w-full h-full bg-slate-900/60 flex items-center justify-center">
-                                                        <span className="material-symbols-outlined text-slate-500 animate-spin text-sm">progress_activity</span>
-                                                    </div>
-                                                ) : (
-                                                    <img src={image.url} alt={image.name} className="w-full h-full object-cover" />
-                                                )}
-                                                <span className="absolute top-0.5 left-1 text-[9px] font-bold text-white drop-shadow">{i + 1}</span>
-                                                {!image.uploading && (
-                                                    <button
-                                                        onClick={e => { e.stopPropagation(); removeImage(i); }}
-                                                        className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500 transition-colors"
-                                                    >
-                                                        <span className="material-symbols-outlined text-white text-[10px]">close</span>
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <MediaThumbnails images={images} onRemove={removeImage} onReorder={reorderImages} />
                                 )}
                             </section>
 
@@ -242,9 +202,10 @@ export default function VideoCreator() {
                                 <textarea
                                     value={form.data.script}
                                     onChange={e => form.setData('script', e.target.value)}
-                                    className="w-full h-32 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#5555f6]/50 resize-none"
+                                    className={`w-full h-32 bg-slate-900/60 border rounded-2xl p-4 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#5555f6]/50 resize-none ${form.errors.script ? 'border-red-400' : 'border-slate-800'}`}
                                     placeholder="Write your script or let AI generate one..."
                                 />
+                                {form.errors.script && <p className="text-xs text-red-400">{form.errors.script}</p>}
                                 <button className="text-sm text-[#5555f6] hover:text-[#ec4899] transition-colors flex items-center gap-1">
                                     <span className="material-symbols-outlined text-base">auto_awesome</span>
                                     Generate with AI

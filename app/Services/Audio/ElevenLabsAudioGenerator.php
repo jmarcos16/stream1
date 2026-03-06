@@ -44,7 +44,7 @@ final class ElevenLabsAudioGenerator implements AudioGeneratorInterface
             throw new RuntimeException('ElevenLabs API Error: '.$response->body());
         }
 
-        Storage::disk('local')->put($outputFilePath, $response->body());
+        Storage::disk('public')->put($outputFilePath, $response->body());
 
         return $outputFilePath;
     }

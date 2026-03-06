@@ -27,14 +27,14 @@ class MergeAudioVideoJob implements ShouldQueue
         $this->video->refresh();
         $this->video->update(['status' => VideoStatus::PROCESSING]);
 
-        $audioPath = Storage::disk('local')->path($this->video->audio_path);
-        $videoPath = Storage::disk('local')->path($this->video->raw_video_path);
+        $audioPath = Storage::disk('public')->path($this->video->audio_path);
+        $videoPath = Storage::disk('public')->path($this->video->raw_video_path);
 
         if (! file_exists($audioPath) || ! file_exists($videoPath)) {
             throw new Exception('Audio or video file not found.');
         }
 
-        $outputDir = Storage::disk('local')->path('videos/'.$this->video->id);
+        $outputDir = Storage::disk('public')->path('videos/'.$this->video->id);
 
         if (! is_dir($outputDir)) {
             mkdir($outputDir, 0755, true);

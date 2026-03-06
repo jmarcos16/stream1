@@ -45,7 +45,7 @@ final class OpenAiAudioGenerator implements AudioGeneratorInterface
             throw new RuntimeException('OpenAI TTS API Error: '.$response->body());
         }
 
-        Storage::disk('local')->put($outputFilePath, $response->body());
+        Storage::disk('public')->put($outputFilePath, $response->body());
 
         return $outputFilePath;
     }

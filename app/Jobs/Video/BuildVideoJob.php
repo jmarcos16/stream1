@@ -58,11 +58,11 @@ class BuildVideoJob implements ShouldQueue
 
         $this->clipDuration = $this->calculateClipDuration(count($images));
 
-        $localDisk = Storage::disk('local');
-        $videoDir = $localDisk->path('videos/'.$this->video->id);
+        $publicDisk = Storage::disk('public');
+        $videoDir = $publicDisk->path('videos/'.$this->video->id);
         File::ensureDirectoryExists($videoDir);
 
-        $tempDir = $localDisk->path('videos/temp/'.$this->video->id);
+        $tempDir = $publicDisk->path('videos/'.$this->video->id.'/temp');
         File::ensureDirectoryExists($tempDir);
 
         $output = $videoDir.'/raw_video.mp4';
@@ -93,7 +93,7 @@ class BuildVideoJob implements ShouldQueue
      */
     private function getImages(): array
     {
-        $imagesPath = storage_path('app/public/images/'.$this->video->id);
+        $imagesPath = Storage::disk('public')->path('videos/'.$this->video->id.'/images');
 
         if (! is_dir($imagesPath)) {
             return [];

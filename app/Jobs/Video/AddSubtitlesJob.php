@@ -28,9 +28,9 @@ class AddSubtitlesJob implements ShouldQueue
         $this->video->refresh();
         $this->video->update(['status' => VideoStatus::PROCESSING]);
 
-        $localDisk = Storage::disk('local');
-        $audioFullPath = $localDisk->path($this->video->audio_path);
-        $videoFullPath = $localDisk->path($this->video->video_path);
+        $publicDisk = Storage::disk('public');
+        $audioFullPath = $publicDisk->path($this->video->audio_path);
+        $videoFullPath = $publicDisk->path($this->video->video_path);
 
         if (! file_exists($audioFullPath)) {
             throw new Exception('Audio file not found for subtitle generation.');
@@ -41,7 +41,7 @@ class AddSubtitlesJob implements ShouldQueue
         }
 
         $wordsJsonRelative = 'videos/'.$this->video->id.'/words.json';
-        $wordsJsonPath = $localDisk->path($wordsJsonRelative);
+        $wordsJsonPath = $publicDisk->path($wordsJsonRelative);
 
         $subtitleGenerator->generate($audioFullPath, $wordsJsonPath);
 
