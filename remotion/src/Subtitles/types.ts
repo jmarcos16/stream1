@@ -11,4 +11,5 @@ export type SubtitleOverlayProps = {
     fps: number;
     width: number;
     height: number;
+    style?: 'bottom' | 'center';
 };

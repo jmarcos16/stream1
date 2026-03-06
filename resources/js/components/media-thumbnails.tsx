@@ -14,7 +14,11 @@ type Props = {
     onReorder: (from: number, to: number) => void;
 };
 
-export default function MediaThumbnails({ images, onRemove, onReorder }: Props) {
+export default function MediaThumbnails({
+    images,
+    onRemove,
+    onReorder,
+}: Props) {
     const [dragIndex, setDragIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
     const [previewIndex, setPreviewIndex] = useState<number | null>(null);
@@ -37,51 +41,82 @@ export default function MediaThumbnails({ images, onRemove, onReorder }: Props) 
                         key={image.path || i}
                         draggable={!image.uploading}
                         onDragStart={() => setDragIndex(i)}
-                        onDragOver={e => { e.preventDefault(); setDragOverIndex(i); }}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            setDragOverIndex(i);
+                        }}
                         onDrop={() => handleDrop(i)}
-                        onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); }}
-                        className={`group/thumb relative w-16 h-24 rounded-lg border shrink-0 overflow-hidden transition-all ${
-                            dragOverIndex === i ? 'border-[#5555f6] scale-105' : 'border-slate-800'
+                        onDragEnd={() => {
+                            setDragIndex(null);
+                            setDragOverIndex(null);
+                        }}
+                        className={`group/thumb relative h-24 w-16 shrink-0 overflow-hidden rounded-lg border transition-all ${
+                            dragOverIndex === i
+                                ? 'scale-105 border-[#5555f6]'
+                                : 'border-slate-800'
                         } ${dragIndex === i ? 'opacity-40' : ''} ${!image.uploading ? 'cursor-grab active:cursor-grabbing' : ''}`}
                     >
                         {image.uploading ? (
-                            <div className="w-full h-full bg-slate-900/60 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-slate-500 animate-spin text-sm">progress_activity</span>
+                            <div className="flex h-full w-full items-center justify-center bg-slate-900/60">
+                                <span className="material-symbols-outlined animate-spin text-sm text-slate-500">
+                                    progress_activity
+                                </span>
                             </div>
                         ) : (
                             <>
                                 <img
                                     src={image.url}
                                     alt={image.name}
-                                    className="w-full h-full object-cover cursor-pointer"
+                                    className="h-full w-full cursor-pointer object-cover"
                                     onClick={() => setPreviewIndex(i)}
                                 />
-                                <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/40 transition-colors" />
+                                <div className="absolute inset-0 bg-black/0 transition-colors group-hover/thumb:bg-black/40" />
                                 <button
-                                    onClick={e => { e.stopPropagation(); onRemove(i); }}
-                                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center hover:bg-red-500/90 transition-all"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onRemove(i);
+                                    }}
+                                    className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 opacity-0 transition-all group-hover/thumb:opacity-100 hover:bg-red-500/90"
                                 >
-                                    <span className="material-symbols-outlined text-white text-xs font-bold">close</span>
+                                    <span className="material-symbols-outlined text-xs font-bold text-white">
+                                        close
+                                    </span>
                                 </button>
                             </>
                         )}
-                        <span className="absolute bottom-0.5 left-1 text-[9px] font-bold text-white drop-shadow">{i + 1}</span>
+                        <span className="absolute bottom-0.5 left-1 text-[9px] font-bold text-white drop-shadow">
+                            {i + 1}
+                        </span>
                     </div>
                 ))}
             </div>
 
-            <Dialog open={previewIndex !== null} onOpenChange={() => setPreviewIndex(null)}>
-                <DialogContent className="bg-slate-900 border-slate-800 p-2 max-w-lg">
+            <Dialog
+                open={previewIndex !== null}
+                onOpenChange={() => setPreviewIndex(null)}
+            >
+                <DialogContent className="max-w-lg border-slate-800 bg-slate-900 p-2">
                     {previewImage && (
                         <div className="space-y-2">
-                            <img src={previewImage.url} alt={previewImage.name} className="w-full rounded-lg" />
+                            <img
+                                src={previewImage.url}
+                                alt={previewImage.name}
+                                className="w-full rounded-lg"
+                            />
                             <div className="flex items-center justify-between px-2 pb-1">
-                                <p className="text-xs text-slate-400 truncate">{previewImage.name}</p>
+                                <p className="truncate text-xs text-slate-400">
+                                    {previewImage.name}
+                                </p>
                                 <button
-                                    onClick={() => { onRemove(previewIndex!); setPreviewIndex(null); }}
-                                    className="text-xs text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"
+                                    onClick={() => {
+                                        onRemove(previewIndex!);
+                                        setPreviewIndex(null);
+                                    }}
+                                    className="flex items-center gap-1 text-xs text-red-400 transition-colors hover:text-red-300"
                                 >
-                                    <span className="material-symbols-outlined text-sm">delete</span>
+                                    <span className="material-symbols-outlined text-sm">
+                                        delete
+                                    </span>
                                     Remove
                                 </button>
                             </div>

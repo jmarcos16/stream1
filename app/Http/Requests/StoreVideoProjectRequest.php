@@ -24,6 +24,7 @@ class StoreVideoProjectRequest extends FormRequest
             'script' => ['required', 'string', 'max:5000'],
             'images' => ['required', 'array', 'min:1'],
             'images.*' => ['required', 'string'],
+            'subtitle_style' => ['required', 'string', 'in:bottom,center'],
         ];
     }
 }

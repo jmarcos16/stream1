@@ -21,6 +21,7 @@ final class VideoGenerationController extends Controller
             'title' => $request->input('title'),
             'script' => $request->input('script'),
             'status' => VideoStatus::PENDING,
+            'subtitle_style' => $request->input('subtitle_style'),
         ]);
 
         $this->moveImagesToVideoFolder($video, $request->input('images'));
@@ -29,7 +30,7 @@ final class VideoGenerationController extends Controller
             new GenerateAudioJob($video),
             new BuildVideoJob($video),
             new MergeAudioVideoJob($video),
-            // new AddSubtitlesJob($video),
+            new AddSubtitlesJob($video),
             // new CleanupVideoFilesJob($video),desativar por enquanto para manter os arquivos para debug
         ])
             ->catch(function (\Throwable $e) use ($video) {

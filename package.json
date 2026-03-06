@@ -50,6 +50,7 @@
         "@remotion/captions": "^4.0.431",
         "@remotion/cli": "^4.0.431",
         "@remotion/layout-utils": "^4.0.431",
+        "@remotion/openai-whisper": "4.0.431",
         "@remotion/renderer": "^4.0.431",
         "@tailwindcss/vite": "^4.1.11",
         "@types/react": "^19.2.0",

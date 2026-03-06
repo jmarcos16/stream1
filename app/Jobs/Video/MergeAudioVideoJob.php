@@ -64,15 +64,9 @@ class MergeAudioVideoJob implements ShouldQueue
         }
 
         $this->video->update([
-            'status' => VideoStatus::COMPLETED,
             'video_path' => 'videos/'.$this->video->id.'/final_video.mp4',
         ]);
 
-        VideoProcessingUpdated::dispatch(
-            $this->video->id,
-            'merge',
-            'completed',
-            Storage::disk('public')->url('videos/'.$this->video->id.'/final_video.mp4'),
-        );
+        VideoProcessingUpdated::dispatch($this->video->id, 'merge', 'completed');
     }
 }

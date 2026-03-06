@@ -11,5 +11,14 @@ services:
       timeout: 5s
       retries: 3
 
+  remotion:
+    build:
+      context: .
+      dockerfile: docker/remotion/Dockerfile
+    volumes:
+      - ./storage/app/public/videos:/data/videos
+      - ./public/Montserrat-Black.ttf:/app/public/Montserrat-Black.ttf:ro
+    entrypoint: ["tail", "-f", "/dev/null"]
+
 volumes:
   redis-data:

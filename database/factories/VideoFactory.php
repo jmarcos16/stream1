@@ -26,6 +26,7 @@ class VideoFactory extends Factory
             'video_path' => null,
             'raw_video_path' => null,
             'srt_path' => null,
+            'subtitle_style' => 'bottom',
         ];
     }
 }

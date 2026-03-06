@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Video;
 
+use App\Events\VideoProcessingUpdated;
 use App\Models\Video;
 use App\Services\Subtitle\SubtitleGeneratorInterface;
 use App\VideoStatus;
@@ -28,6 +29,8 @@ class AddSubtitlesJob implements ShouldQueue
         $this->video->refresh();
         $this->video->update(['status' => VideoStatus::PROCESSING]);
 
+        VideoProcessingUpdated::dispatch($this->video->id, 'subtitles', 'processing');
+
         $publicDisk = Storage::disk('public');
         $audioFullPath = $publicDisk->path($this->video->audio_path);
         $videoFullPath = $publicDisk->path($this->video->video_path);
@@ -47,7 +50,7 @@ class AddSubtitlesJob implements ShouldQueue
 
         $outputPath = dirname($videoFullPath).'/subtitled_video.mp4';
 
-        $this->renderWithRemotion($videoFullPath, $wordsJsonPath, $outputPath);
+        $this->renderWithDocker($videoFullPath, $wordsJsonPath, $outputPath);
 
         rename($outputPath, $videoFullPath);
 
@@ -55,19 +58,33 @@ class AddSubtitlesJob implements ShouldQueue
             'srt_path' => $wordsJsonRelative,
             'status' => VideoStatus::COMPLETED,
         ]);
+
+        VideoProcessingUpdated::dispatch(
+            $this->video->id,
+            'subtitles',
+            'completed',
+            Storage::disk('public')->url($this->video->video_path),
+        );
     }
 
-    private function renderWithRemotion(string $videoPath, string $wordsJsonPath, string $outputPath): void
+    private function renderWithDocker(string $videoPath, string $wordsJsonPath, string $outputPath): void
     {
-        $renderScript = base_path('remotion/render-subtitles.mts');
         $duration = $this->video->audio_duration ?? 30;
+        $videoDir = dirname($videoPath);
+        $videoFile = basename($videoPath);
+        $wordsFile = basename($wordsJsonPath);
+        $outputFile = basename($outputPath);
+        $subtitleStyle = $this->video->subtitle_style ?? 'bottom';
 
         $process = new Process([
-            'npx', 'tsx', $renderScript,
-            '--video='.$videoPath,
-            '--words='.$wordsJsonPath,
-            '--output='.$outputPath,
+            'docker', 'compose', 'exec', '-T', 'remotion',
+            'npx', 'tsx', 'remotion/render-subtitles.mts',
+            '--video=/data/videos/'.$this->video->id.'/'.$videoFile,
+            '--words=/data/videos/'.$this->video->id.'/'.$wordsFile,
+            '--output=/data/videos/'.$this->video->id.'/'.$outputFile,
             '--duration='.$duration,
+            '--style='.$subtitleStyle,
+            '--chrome=/usr/bin/chromium',
         ]);
 
         $process->setTimeout(900);
@@ -75,7 +92,7 @@ class AddSubtitlesJob implements ShouldQueue
         $process->run();
 
         if (! $process->isSuccessful()) {
-            throw new Exception('Remotion render failed: '.$process->getErrorOutput());
+            throw new Exception('Remotion Docker render failed: '.$process->getErrorOutput());
         }
     }
 }

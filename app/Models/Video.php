@@ -23,6 +23,7 @@ final class Video extends Model
         'video_path',
         'raw_video_path',
         'srt_path',
+        'subtitle_style',
     ];
 
     /**
