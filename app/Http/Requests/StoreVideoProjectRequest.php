@@ -15,8 +15,6 @@ class StoreVideoProjectRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
@@ -24,8 +22,6 @@ class StoreVideoProjectRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'script' => ['required', 'string', 'max:5000'],
-            'aiVoiceover' => ['required', 'boolean'],
-            'autoSubtitles' => ['required', 'boolean'],
             'images' => ['required', 'array', 'min:1'],
             'images.*' => ['required', 'string'],
         ];

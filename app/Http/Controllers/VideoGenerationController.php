@@ -25,10 +25,10 @@ final class VideoGenerationController extends Controller
         $this->moveImagesToVideoFolder($video, $request->input('images'));
 
         Bus::chain([
-            new GenerateAudioJob($video),
-            new BuildVideoJob($video),
-            new MergeAudioVideoJob($video),
-            new AddSubtitlesJob($video),
+            // new GenerateAudioJob($video),
+            // new BuildVideoJob($video),
+            // new MergeAudioVideoJob($video),
+            // new AddSubtitlesJob($video),
             // new CleanupVideoFilesJob($video),desativar por enquanto para manter os arquivos para debug
         ])
             ->catch(function (\Throwable $e) use ($video) {

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\MediaUploadController;
+use App\Http\Controllers\TempMediaController;
 use App\Http\Controllers\VideoCreatorController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,10 +14,10 @@ Route::get('video-creator', [VideoCreatorController::class, 'index'])
 Route::post('video/generate', [\App\Http\Controllers\VideoGenerationController::class, 'process'])
     ->name('video.generate');
 
-Route::post('videos/{video}/media/upload', [MediaUploadController::class, 'upload'])
-    ->name('media.upload');
+Route::post('temp-media', [TempMediaController::class, 'store'])
+    ->name('temp-media.store');
 
-Route::delete('videos/{video}/media/{filename}', [MediaUploadController::class, 'delete'])
-    ->name('media.delete');
+Route::delete('temp-media/{filename}', [TempMediaController::class, 'destroy'])
+    ->name('temp-media.destroy');
 
 require __DIR__.'/settings.php';
