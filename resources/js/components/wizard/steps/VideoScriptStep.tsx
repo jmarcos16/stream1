@@ -5,7 +5,7 @@ import {
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Video } from '@/types/video';
 import { router } from '@inertiajs/react';
 import { update } from '@/routes/video/script';
@@ -19,22 +19,47 @@ type Props = {
 
 export function VideoScriptStep({ video, onNext, onBack }: Props) {
     const [script, setScript] = useState(video.script || '');
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        setScript(video.script || '');
+    }, [video.script]);
 
     const saveScript = useCallback(
-        debounce((value: string) => {
-            router.patch(update({ video: video.id }), { script: value }, { preserveScroll: true });
+        debounce((value: string, originalValue: string) => {
+            if (value !== originalValue) {
+                setIsSaving(true);
+                router.patch(
+                    update({ video: video.id }),
+                    { script: value },
+                    {
+                        preserveScroll: true,
+                        onFinish: () => setIsSaving(false),
+                    }
+                );
+            }
         }, 2000),
         [video.id]
     );
 
     const handleChange = (value: string) => {
         setScript(value);
-        saveScript(value);
+        saveScript(value, video.script || '');
     };
 
     const handleBlur = () => {
         saveScript.cancel();
-        router.patch(update({ video: video.id }), { script }, { preserveScroll: true });
+        if (script !== video.script) {
+            setIsSaving(true);
+            router.patch(
+                update({ video: video.id }),
+                { script },
+                {
+                    preserveScroll: true,
+                    onFinish: () => setIsSaving(false),
+                }
+            );
+        }
     };
 
     return (
@@ -78,7 +103,8 @@ export function VideoScriptStep({ video, onNext, onBack }: Props) {
             <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50 p-6">
                 <button
                     onClick={onBack}
-                    className="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100"
+                    disabled={isSaving}
+                    className="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <ChevronLeft className="h-5 w-5" />
                     Back
@@ -89,7 +115,8 @@ export function VideoScriptStep({ video, onNext, onBack }: Props) {
                     </span>
                     <button
                         onClick={onNext}
-                        className="flex items-center gap-2 rounded-xl bg-indigo-500 px-8 py-2.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-indigo-500/30"
+                        disabled={isSaving}
+                        className="flex items-center gap-2 rounded-xl bg-indigo-500 px-8 py-2.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Generation Settings
                         <ChevronRight className="h-5 w-5" />

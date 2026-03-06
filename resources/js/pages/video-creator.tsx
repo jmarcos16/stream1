@@ -1,141 +1,155 @@
-import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
-import { useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import AppHeaderLayout from '@/layouts/app/app-header-layout';
-import UploadMediaModal from '@/components/upload-media-modal';
-import { ImageList } from '@/components/image-list';
-import VideoProjectHeader from '@/components/video-project-header';
-import VideoList from '@/components/video-list';
-import type { UploadedImage } from '@/types/upload';
-import type { Video } from '@/types/video';
-import { process } from '@/routes/video/generate';
+import { Head } from '@inertiajs/react';
 
-type Props = {
-    videos: Video[];
-};
-
-export default function VideoCreator({ videos }: Props) {
-    const [uploadModalOpen, setUploadModalOpen] = useState(false);
-    const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-
-    const form = useForm({
-        title: 'Untitled_Project_01',
-        script: '',
-        aiVoiceover: true,
-        autoSubtitles: true,
-        images: [] as string[],
-    });
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        router.post(process.url(), {
-            ...form.data,
-            images: uploadedImages.map((img) => img.path),
-        });
-    };
-
-    const handleReset = () => {
-        form.reset();
-        setUploadedImages([]);
-    };
-
+export default function VideoCreator() {
     return (
         <>
-            <Head title="VidGen AI - Video Creator" />
-            <AppHeaderLayout>
-                <main className="flex flex-1">
-                    <aside className="flex w-96 flex-col border-r border-solid border-[#27272a] bg-[#09090b]">
-                        <VideoProjectHeader
-                            title={form.data.title}
-                            onTitleChange={(title) =>
-                                form.setData('title', title)
-                            }
-                        />
+            <Head title="ShortsGen - Video Creator" />
+            
+            <div className="min-h-screen flex flex-col bg-[#020617] text-slate-100 antialiased">
+                {/* Navigation */}
+                <nav className="h-16 px-8 border-b border-slate-800/60 flex items-center justify-between backdrop-blur-xl bg-slate-900/40 sticky top-0 z-50">
+                    <div className="flex items-center gap-8">
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[#5555f6] text-2xl">movie_filter</span>
+                            <span className="text-lg font-bold tracking-tight">Shorts<span className="text-[#5555f6]">Gen</span></span>
+                        </div>
+                        <div className="hidden md:flex items-center gap-6">
+                            <a className="text-sm font-medium text-slate-100" href="#">Editor</a>
+                            <a className="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Projects</a>
+                            <a className="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Assets</a>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button className="p-2 text-slate-400 hover:text-white transition-colors">
+                            <span className="material-symbols-outlined">notifications</span>
+                        </button>
+                        <div className="h-8 w-8 rounded-full bg-slate-800 border border-slate-700 overflow-hidden">
+                            <div className="w-full h-full bg-gradient-to-br from-[#5555f6] to-[#ec4899]" />
+                        </div>
+                    </div>
+                </nav>
 
-                        <form
-                            onSubmit={handleSubmit}
-                            className="flex flex-1 flex-col"
-                        >
-                            <div className="flex-1 space-y-8 overflow-y-auto p-6">
-                                <div>
-                                    <h3 className="mb-3 text-sm font-medium tracking-wider text-[#92b7c9] uppercase">
-                                        1. Upload Media
-                                    </h3>
-                                    <Button
-                                        onClick={() => setUploadModalOpen(true)}
-                                        className="w-full bg-white font-medium text-black hover:bg-white/90"
-                                    >
-                                        Upload Media
-                                    </Button>
+                {/* Main Content */}
+                <main className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-12 flex flex-col gap-8">
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold">New Creation</h1>
+                            <p className="text-slate-500 text-sm">Transform your ideas into vertical magic</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button className="px-5 py-2 rounded-xl text-sm font-medium bg-slate-900 border border-slate-800 hover:bg-slate-800 transition-colors">
+                                Save Draft
+                            </button>
+                            <button className="bg-gradient-to-br from-[#5555f6] to-[#ec4899] px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-[#5555f6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
+                                <span className="material-symbols-outlined text-lg">bolt</span>
+                                Generate Video
+                            </button>
+                        </div>
+                    </div>
 
-                                    <div className="mt-4">
-                                        <ImageList
-                                            items={uploadedImages}
-                                            onRemove={(id) =>
-                                                setUploadedImages(
-                                                    uploadedImages.filter(
-                                                        (img) => img.id !== id,
-                                                    ),
-                                                )
-                                            }
-                                            title="Uploaded Images"
-                                        />
+                    {/* Main Card */}
+                    <div className="backdrop-blur-xl bg-slate-900/40 border border-slate-800/40 rounded-[2rem] p-8 flex flex-col lg:flex-row gap-12">
+                        {/* Left Column - Form */}
+                        <div className="flex-1 flex flex-col gap-10">
+                            {/* Media Assets */}
+                            <section className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-slate-400 text-xl">image</span>
+                                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Media Assets</h3>
+                                </div>
+                                <div className="group relative bg-slate-900/40 border-2 border-dashed border-slate-800 rounded-2xl p-10 flex flex-col items-center justify-center transition-all hover:border-[#5555f6]/50 hover:bg-slate-900/60 cursor-pointer">
+                                    <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mb-3 group-hover:bg-[#5555f6]/10 transition-colors">
+                                        <span className="material-symbols-outlined text-slate-400 group-hover:text-[#5555f6] transition-colors">add</span>
+                                    </div>
+                                    <p className="text-sm font-medium text-slate-300">Drop images here or browse</p>
+                                    <p className="text-[11px] text-slate-500 mt-1">Up to 10 images • 9:16 recommended</p>
+                                </div>
+                                <div className="flex gap-3 overflow-x-auto pb-2">
+                                    {[...Array(5)].map((_, i) => (
+                                        <div key={i} className="w-16 h-24 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined text-slate-700">image</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* Script */}
+                            <section className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-slate-400 text-xl">description</span>
+                                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Script</h3>
+                                </div>
+                                <textarea 
+                                    className="w-full h-32 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#5555f6]/50 resize-none"
+                                    placeholder="Write your script or let AI generate one..."
+                                />
+                                <button className="text-sm text-[#5555f6] hover:text-[#ec4899] transition-colors flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-base">auto_awesome</span>
+                                    Generate with AI
+                                </button>
+                            </section>
+
+                            {/* Voice & Music */}
+                            <section className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-slate-400 text-xl">graphic_eq</span>
+                                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Voice & Music</h3>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-slate-500">Voice</label>
+                                        <select className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#5555f6]/50">
+                                            <option>Natural Female</option>
+                                            <option>Natural Male</option>
+                                            <option>Energetic</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-slate-500">Background Music</label>
+                                        <select className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#5555f6]/50">
+                                            <option>Upbeat</option>
+                                            <option>Chill</option>
+                                            <option>Epic</option>
+                                        </select>
                                     </div>
                                 </div>
+                            </section>
 
-                                <div>
-                                    <h3 className="mb-3 text-sm font-medium tracking-wider text-[#92b7c9] uppercase">
-                                        2. Enter Script
-                                    </h3>
-                                    <Textarea
-                                        value={form.data.script}
-                                        onChange={(e) =>
-                                            form.setData(
-                                                'script',
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="min-h-36 border-[#27272a] bg-[#18181b] text-white placeholder:text-zinc-500 focus-visible:ring-white"
-                                        placeholder="Tell your story here. The AI will match your media to the script."
-                                    />
+                            {/* Style */}
+                            <section className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-slate-400 text-xl">palette</span>
+                                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Style</h3>
+                                </div>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {['Minimal', 'Bold', 'Cinematic'].map((style) => (
+                                        <button key={style} className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-sm font-medium text-slate-300 hover:border-[#5555f6] hover:text-white transition-all">
+                                            {style}
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
+                        </div>
+
+                        {/* Right Column - Preview */}
+                        <div className="lg:w-80 flex flex-col gap-4">
+                            <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-slate-400 text-xl">visibility</span>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Preview</h3>
+                            </div>
+                            <div className="aspect-[9/16] bg-slate-900/60 border border-slate-800 rounded-3xl overflow-hidden shadow-[0_0_40px_-10px_rgba(85,85,246,0.2)] flex items-center justify-center">
+                                <div className="text-center space-y-3">
+                                    <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto">
+                                        <span className="material-symbols-outlined text-slate-600 text-3xl">play_circle</span>
+                                    </div>
+                                    <p className="text-sm text-slate-500">Preview will appear here</p>
                                 </div>
                             </div>
-
-                            <div className="shrink-0 space-y-3 border-t border-solid border-[#27272a] p-6">
-                                <Button
-                                    type="submit"
-                                    disabled={form.processing}
-                                    className="w-full bg-white font-semibold text-black shadow-sm hover:bg-white/90"
-                                >
-                                    {form.processing
-                                        ? 'Generating...'
-                                        : 'Generate Video'}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className="w-full font-medium text-[#92b7c9] hover:bg-white/10 hover:text-white"
-                                    onClick={handleReset}
-                                >
-                                    Reset
-                                </Button>
-                            </div>
-                        </form>
-                    </aside>
-
-                    <VideoList videos={videos} />
-
-                    <UploadMediaModal
-                        open={uploadModalOpen}
-                        onOpenChange={setUploadModalOpen}
-                        onUploadSuccess={(files) =>
-                            setUploadedImages((prev) => [...prev, ...files])
-                        }
-                    />
+                        </div>
+                    </div>
                 </main>
-            </AppHeaderLayout>
+            </div>
         </>
     );
 }
