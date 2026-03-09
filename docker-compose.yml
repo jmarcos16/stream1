@@ -16,8 +16,8 @@ services:
       context: .
       dockerfile: docker/remotion/Dockerfile
     volumes:
-      - ./storage/app/public/videos:/data/videos
-      - ./public/Montserrat-Black.ttf:/app/public/Montserrat-Black.ttf:ro
+      - /home/jmarcos16/stream1/storage/app/public/videos:/data/videos
+      - /home/jmarcos16/stream1/public/Montserrat-Black.ttf:/app/public/Montserrat-Black.ttf:ro
     entrypoint: ["tail", "-f", "/dev/null"]
 
 volumes:

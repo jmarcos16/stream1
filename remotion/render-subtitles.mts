@@ -69,6 +69,7 @@ await renderMedia({
     outputLocation: outputPath,
     inputProps,
     concurrency: 1,
+    timeoutInMilliseconds: 220000,
     offthreadVideoCacheSizeInBytes: 512 * 1024 * 1024,
     ...(chromePath ? { chromiumExecutable: chromePath } : {}),
 });
