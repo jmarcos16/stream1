@@ -5,6 +5,7 @@ import { store as uploadMedia } from '@/routes/temp-media';
 import { destroy as deleteMedia } from '@/routes/temp-media';
 import MediaThumbnails from '@/components/media-thumbnails';
 import VideoProcessingPreview from '@/components/video-processing-preview';
+import AppLayout from '@/layouts/app-layout';
 import axios from 'axios';
 
 type UploadedImage = {
@@ -136,54 +137,10 @@ export default function VideoCreator() {
                 onChange={(e) => e.target.files && handleFiles(e.target.files)}
             />
 
-            <div className="flex min-h-screen flex-col bg-[#020617] text-slate-100 antialiased">
-                <nav className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-slate-800/60 bg-slate-900/40 px-8 backdrop-blur-xl">
-                    <div className="flex items-center gap-8">
-                        <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-2xl text-[#5555f6]">
-                                movie_filter
-                            </span>
-                            <span className="text-lg font-bold tracking-tight">
-                                Shorts
-                                <span className="text-[#5555f6]">Gen</span>
-                            </span>
-                        </div>
-                        <div className="hidden items-center gap-6 md:flex">
-                            <a
-                                className="text-sm font-medium text-slate-100"
-                                href="#"
-                            >
-                                Editor
-                            </a>
-                            <a
-                                className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
-                                href="#"
-                            >
-                                Projects
-                            </a>
-                            <a
-                                className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
-                                href="#"
-                            >
-                                Assets
-                            </a>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <button className="p-2 text-slate-400 transition-colors hover:text-white">
-                            <span className="material-symbols-outlined">
-                                notifications
-                            </span>
-                        </button>
-                        <div className="h-8 w-8 overflow-hidden rounded-full border border-slate-700 bg-slate-800">
-                            <div className="h-full w-full bg-gradient-to-br from-[#5555f6] to-[#ec4899]" />
-                        </div>
-                    </div>
-                </nav>
-
-                <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 p-6 md:p-12">
-                    <div className="flex items-center justify-between">
-                        <div>
+            <AppLayout>
+                <div className="w-full flex-1 flex-col gap-8 p-6 md:p-12 text-slate-100 antialiased">
+                    <div className="mx-auto w-full max-w-7xl flex flex-col gap-8">
+                        <div className="flex items-center justify-between">
                             <input
                                 type="text"
                                 value={form.data.title}
@@ -504,8 +461,8 @@ export default function VideoCreator() {
                             </div>
                         </div>
                     </div>
-                </main>
-            </div>
+                </div>
+            </AppLayout>
         </>
     );
 }
