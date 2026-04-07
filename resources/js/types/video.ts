@@ -1,3 +1,10 @@
+export type SubtitleSegment = {
+    index: number;
+    start: number;
+    end: number;
+    text: string;
+};
+
 export type Video = {
     id: number;
     title: string | null;
@@ -8,7 +15,9 @@ export type Video = {
     audio_path: string | null;
     audio_duration: number | null;
     video_path: string | undefined;
+    video_url: string | null;
     raw_video_path: string | null;
+    raw_video_url: string | null;
     srt_path: string | null;
     subtitle_style: 'bottom' | 'center';
     encoder: 'cpu' | 'gpu';

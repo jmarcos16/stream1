@@ -27,6 +27,9 @@ Route::delete('temp-media/{filename}', [TempMediaController::class, 'destroy'])
 Route::get('videos', [VideoController::class, 'index'])
     ->name('videos.index');
 
+Route::get('videos/{video}', [VideoController::class, 'show'])
+    ->name('videos.show');
+
 Route::delete('videos/{video}', [VideoController::class, 'destroy'])
     ->name('videos.destroy');
 

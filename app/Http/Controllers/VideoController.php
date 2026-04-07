@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Video;
+use App\Services\Subtitle\SrtParser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -23,6 +25,22 @@ class VideoController extends Controller
             'filters' => [
                 'status' => $request->query('status', ''),
             ],
+        ]);
+    }
+
+    public function show(Video $video, SrtParser $srtParser): Response
+    {
+        abort_unless($video->status->value === 'completed', 404);
+
+        $subtitles = [];
+
+        if ($video->srt_path && Storage::exists($video->srt_path)) {
+            $subtitles = $srtParser->parse(Storage::get($video->srt_path));
+        }
+
+        return Inertia::render('videos/show', [
+            'video' => $video,
+            'subtitles' => $subtitles,
         ]);
     }
 

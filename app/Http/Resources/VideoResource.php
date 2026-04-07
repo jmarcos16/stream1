@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class VideoResource extends JsonResource
 {
@@ -22,7 +23,9 @@ class VideoResource extends JsonResource
             'audio_path' => $this->audio_path,
             'audio_duration' => $this->audio_duration,
             'video_path' => $this->video_path,
+            'video_url' => $this->video_path ? Storage::url($this->video_path) : null,
             'raw_video_path' => $this->raw_video_path,
+            'raw_video_url' => $this->raw_video_path ? Storage::url($this->raw_video_path) : null,
             'srt_path' => $this->srt_path,
             'subtitle_style' => $this->subtitle_style,
             'encoder' => $this->encoder?->value,

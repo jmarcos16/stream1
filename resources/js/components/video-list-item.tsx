@@ -1,5 +1,5 @@
-import { router } from '@inertiajs/react';
-import { Download, FileText, Film, MoreVertical, Trash2 } from 'lucide-react';
+import { Link, router } from '@inertiajs/react';
+import { Download, FileText, Film, MoreVertical, Trash2, Tv2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -95,6 +95,15 @@ export default function VideoListItem({ video }: VideoListItemProps) {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 border-slate-800 bg-slate-900">
+                    {liveStatus.status === 'completed' && (
+                        <DropdownMenuItem asChild>
+                            <Link href={`/videos/${video.id}`} className="cursor-pointer">
+                                <Tv2 className="mr-2 h-4 w-4" />
+                                Open Timeline
+                            </Link>
+                        </DropdownMenuItem>
+                    )}
+                    {liveStatus.status === 'completed' && <DropdownMenuSeparator className="bg-slate-800" />}
                     {video.status === 'completed' && video.video_path && (
                         <DropdownMenuItem asChild>
                             <a href={`/videos/${video.id}/download`} className="cursor-pointer">
