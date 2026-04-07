@@ -33,6 +33,9 @@ Route::get('videos/{video}', [VideoController::class, 'show'])
 Route::delete('videos/{video}', [VideoController::class, 'destroy'])
     ->name('videos.destroy');
 
+Route::post('videos/{video}/generate-subtitles', [VideoController::class, 'generateSubtitles'])
+    ->name('videos.generate-subtitles');
+
 Route::get('videos/{video}/download', [VideoController::class, 'download'])
     ->name('videos.download');
 

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreDraftVideoRequest;
 use App\Jobs\Video\BuildVideoJob;
 use App\Jobs\Video\FinalizeDraftVideoJob;
 use App\Jobs\Video\GenerateAudioJob;
+use App\Jobs\Video\GenerateWordsJob;
 use App\Jobs\Video\MergeAudioVideoJob;
 use App\Models\Video;
 use App\VideoStatus;
@@ -31,6 +32,7 @@ final class DraftVideoController extends Controller
             new GenerateAudioJob($video),
             new BuildVideoJob($video),
             new MergeAudioVideoJob($video),
+            new GenerateWordsJob($video),
             new FinalizeDraftVideoJob($video),
         ])
             ->catch(function (\Throwable $e) use ($video) {
@@ -39,7 +41,7 @@ final class DraftVideoController extends Controller
             })
             ->dispatch();
 
-        return response()->json(['id' => $video->id]);
+        return back();
     }
 
     /**

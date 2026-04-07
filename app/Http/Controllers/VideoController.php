@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GenerateSubtitlesRequest;
+use App\Jobs\Video\AddSubtitlesJob;
+use App\Jobs\Video\MergeAudioVideoJob;
 use App\Models\Video;
-use App\Services\Subtitle\SrtParser;
+use App\Services\Subtitle\WordsJsonParser;
+use App\VideoStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,20 +33,42 @@ class VideoController extends Controller
         ]);
     }
 
-    public function show(Video $video, SrtParser $srtParser): Response
+    public function show(Video $video, WordsJsonParser $wordsParser): Response
     {
-        abort_unless($video->status->value === 'completed', 404);
+        abort_unless(in_array($video->status->value, ['completed', 'processing']), 404);
 
         $subtitles = [];
 
-        if ($video->srt_path && Storage::exists($video->srt_path)) {
-            $subtitles = $srtParser->parse(Storage::get($video->srt_path));
+        if ($video->status->value === 'completed') {
+            $wordsJsonRelative = 'videos/'.$video->id.'/words.json';
+
+            if (Storage::disk('public')->exists($wordsJsonRelative)) {
+                $subtitles = $wordsParser->parse(Storage::disk('public')->get($wordsJsonRelative));
+            }
         }
 
         return Inertia::render('videos/show', [
             'video' => $video,
             'subtitles' => $subtitles,
         ]);
+    }
+
+    public function generateSubtitles(Video $video, GenerateSubtitlesRequest $request): \Illuminate\Http\RedirectResponse
+    {
+        abort_unless($video->raw_video_path && $video->audio_path, 422);
+        abort_if(in_array($video->status->value, ['processing', 'pending']), 409);
+
+        $video->update([
+            'subtitle_style' => $request->validated('subtitle_style'),
+            'status' => VideoStatus::PROCESSING,
+        ]);
+
+        Bus::chain([
+            new MergeAudioVideoJob($video),
+            new AddSubtitlesJob($video),
+        ])->dispatch();
+
+        return redirect()->route('videos.show', $video);
     }
 
     public function destroy(Video $video): \Illuminate\Http\RedirectResponse

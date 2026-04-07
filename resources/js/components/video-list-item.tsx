@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
-import { Download, FileText, Film, MoreVertical, Trash2, Tv2 } from 'lucide-react';
+import { Captions, Download, FileText, Film, MoreVertical, Trash2, Tv2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -8,6 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import GenerateSubtitlesDialog from '@/components/generate-subtitles-dialog';
 import VideoStatusBadge from '@/components/video-status-badge';
 import { useVideoStatus } from '@/hooks/use-video-status';
 import type { Video } from '@/types/video';
@@ -28,6 +30,13 @@ function formatDate(dateString: string): string {
 
 export default function VideoListItem({ video }: VideoListItemProps) {
     const liveStatus = useVideoStatus(video);
+    const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+
+    const canGenerateSubtitles =
+        liveStatus.status === 'completed' && video.raw_video_path && video.audio_path;
+
+    const hasTopActions = liveStatus.status === 'completed' || canGenerateSubtitles;
+    const hasDownloadActions = (liveStatus.status === 'completed' && !!video.video_path) || !!video.srt_path;
 
     function handleDelete() {
         if (confirm('Tem certeza que deseja deletar este vídeo?')) {
@@ -103,8 +112,14 @@ export default function VideoListItem({ video }: VideoListItemProps) {
                             </Link>
                         </DropdownMenuItem>
                     )}
-                    {liveStatus.status === 'completed' && <DropdownMenuSeparator className="bg-slate-800" />}
-                    {video.status === 'completed' && video.video_path && (
+                    {canGenerateSubtitles && (
+                        <DropdownMenuItem onClick={() => setGenerateDialogOpen(true)} className="cursor-pointer">
+                            <Captions className="mr-2 h-4 w-4" />
+                            Generate Subtitles
+                        </DropdownMenuItem>
+                    )}
+                    {hasTopActions && hasDownloadActions && <DropdownMenuSeparator className="bg-slate-800" />}
+                    {liveStatus.status === 'completed' && video.video_path && (
                         <DropdownMenuItem asChild>
                             <a href={`/videos/${video.id}/download`} className="cursor-pointer">
                                 <Download className="mr-2 h-4 w-4" />
@@ -120,7 +135,7 @@ export default function VideoListItem({ video }: VideoListItemProps) {
                             </a>
                         </DropdownMenuItem>
                     )}
-                    {(video.video_path || video.srt_path) && <DropdownMenuSeparator className="bg-slate-800" />}
+                    {(hasTopActions || hasDownloadActions) && <DropdownMenuSeparator className="bg-slate-800" />}
                     <DropdownMenuItem
                         onClick={handleDelete}
                         className="text-red-400 focus:text-red-400"
@@ -130,6 +145,12 @@ export default function VideoListItem({ video }: VideoListItemProps) {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
+
+            <GenerateSubtitlesDialog
+                videoId={video.id}
+                open={generateDialogOpen}
+                onClose={() => setGenerateDialogOpen(false)}
+            />
         </div>
     );
 }

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Pause, Play } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { ArrowLeft, Captions, Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import GenerateSubtitlesDialog from '@/components/generate-subtitles-dialog';
 import AppLayout from '@/layouts/app-layout';
+import { STEP_LABELS, STEPS, useVideoProcessing } from '@/hooks/use-video-processing';
 import type { SubtitleSegment, Video } from '@/types/video';
 
 type VideoShowProps = {
@@ -23,6 +25,18 @@ export default function VideoShow({ video, subtitles }: VideoShowProps) {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(video.audio_duration ?? 0);
     const [activeSegment, setActiveSegment] = useState<SubtitleSegment | null>(null);
+    const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+
+    const isProcessing = video.status === 'processing';
+    const canGenerateSubtitles = !isProcessing && video.raw_video_path && video.audio_path;
+
+    const { steps, completed: processingComplete } = useVideoProcessing(isProcessing ? video.id : null);
+
+    useEffect(() => {
+        if (processingComplete) {
+            router.reload();
+        }
+    }, [processingComplete]);
 
     const videoUrl = video.video_url ?? (video.video_path ? `/storage/${video.video_path}` : null);
 
@@ -128,10 +142,66 @@ export default function VideoShow({ video, subtitles }: VideoShowProps) {
                         </Button>
                     </Link>
                     <h1 className="text-lg font-semibold text-white">{video.title ?? 'Untitled Video'}</h1>
+
+                    {canGenerateSubtitles && (
+                        <div className="ml-auto">
+                            <Button
+                                onClick={() => setGenerateDialogOpen(true)}
+                                variant="outline"
+                                size="sm"
+                                className="border-slate-700 bg-slate-800/60 text-slate-300 hover:border-indigo-500/60 hover:bg-indigo-500/10 hover:text-white"
+                            >
+                                <Captions className="mr-2 h-4 w-4" />
+                                Generate Subtitles
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-4">
-                    {/* Player */}
+                    {isProcessing ? (
+                        <div className="flex flex-col items-center gap-6 rounded-xl border border-slate-800/60 bg-slate-900/40 px-6 py-10">
+                            <div className="text-center">
+                                <p className="text-sm font-semibold text-slate-200">Generating subtitles...</p>
+                                <p className="mt-1 text-xs text-slate-500">This may take a few minutes</p>
+                            </div>
+
+                            <div className="w-full max-w-xs space-y-2">
+                                {STEPS.map((step) => {
+                                    const status = steps[step];
+                                    return (
+                                        <div key={step} className="flex items-center gap-3">
+                                            <div
+                                                className={`h-2 w-2 shrink-0 rounded-full transition-colors ${
+                                                    status === 'completed'
+                                                        ? 'bg-emerald-400'
+                                                        : status === 'processing'
+                                                          ? 'animate-pulse bg-indigo-400'
+                                                          : status === 'failed'
+                                                            ? 'bg-red-400'
+                                                            : 'bg-slate-700'
+                                                }`}
+                                            />
+                                            <span
+                                                className={`text-sm transition-colors ${
+                                                    status === 'processing'
+                                                        ? 'text-white'
+                                                        : status === 'completed'
+                                                          ? 'text-emerald-400'
+                                                          : status === 'failed'
+                                                            ? 'text-red-400'
+                                                            : 'text-slate-600'
+                                                }`}
+                                            >
+                                                {STEP_LABELS[step]}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ) : (
+                        <>
                     <div className="overflow-hidden rounded-xl border border-slate-800/60 bg-slate-900/40">
                         {videoUrl ? (
                             <video
@@ -263,7 +333,15 @@ export default function VideoShow({ video, subtitles }: VideoShowProps) {
                             </div>
                         </div>
                     )}
+                        </>
+                    )}
                 </div>
+
+                <GenerateSubtitlesDialog
+                    videoId={video.id}
+                    open={generateDialogOpen}
+                    onClose={() => setGenerateDialogOpen(false)}
+                />
             </div>
         </AppLayout>
     );

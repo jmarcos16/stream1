@@ -4,6 +4,7 @@ namespace App\Jobs\Video;
 
 use App\Events\VideoProcessingUpdated;
 use App\Models\Video;
+use App\Services\Subtitle\SrtGenerator;
 use App\Services\Subtitle\SubtitleGeneratorInterface;
 use App\VideoStatus;
 use Exception;
@@ -24,7 +25,7 @@ class AddSubtitlesJob implements ShouldQueue
         public Video $video
     ) {}
 
-    public function handle(SubtitleGeneratorInterface $subtitleGenerator): void
+    public function handle(SubtitleGeneratorInterface $subtitleGenerator, SrtGenerator $srtGenerator): void
     {
         $this->video->refresh();
         $this->video->update(['status' => VideoStatus::PROCESSING]);
@@ -46,7 +47,10 @@ class AddSubtitlesJob implements ShouldQueue
         $wordsJsonRelative = 'videos/'.$this->video->id.'/words.json';
         $wordsJsonPath = $publicDisk->path($wordsJsonRelative);
 
-        $subtitleGenerator->generate($audioFullPath, $wordsJsonPath);
+        $words = $subtitleGenerator->generate($audioFullPath, $wordsJsonPath);
+
+        $srtRelative = 'videos/'.$this->video->id.'/subtitles.srt';
+        $publicDisk->put($srtRelative, $srtGenerator->fromWords($words));
 
         $outputPath = dirname($videoFullPath).'/subtitled_video.mp4';
 
@@ -55,7 +59,7 @@ class AddSubtitlesJob implements ShouldQueue
         rename($outputPath, $videoFullPath);
 
         $this->video->update([
-            'srt_path' => $wordsJsonRelative,
+            'srt_path' => $srtRelative,
             'status' => VideoStatus::COMPLETED,
         ]);
 
