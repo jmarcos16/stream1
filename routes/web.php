@@ -15,6 +15,9 @@ Route::get('video-creator', [VideoCreatorController::class, 'index'])
 Route::post('video/generate', [\App\Http\Controllers\VideoGenerationController::class, 'process'])
     ->name('video.generate');
 
+Route::post('video/draft', [\App\Http\Controllers\DraftVideoController::class, 'store'])
+    ->name('video.draft');
+
 Route::post('temp-media', [TempMediaController::class, 'store'])
     ->name('temp-media.store');
 

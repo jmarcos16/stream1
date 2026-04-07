@@ -9,6 +9,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import VideoStatusBadge from '@/components/video-status-badge';
+import { useVideoStatus } from '@/hooks/use-video-status';
 import type { Video } from '@/types/video';
 
 type VideoListItemProps = {
@@ -26,6 +27,8 @@ function formatDate(dateString: string): string {
 }
 
 export default function VideoListItem({ video }: VideoListItemProps) {
+    const liveStatus = useVideoStatus(video);
+
     function handleDelete() {
         if (confirm('Tem certeza que deseja deletar este vídeo?')) {
             router.delete(`/videos/${video.id}`, {
@@ -37,9 +40,16 @@ export default function VideoListItem({ video }: VideoListItemProps) {
     return (
         <div className="group flex items-center gap-4 rounded-xl border border-slate-800/60 bg-slate-900/40 p-4 transition-colors hover:border-slate-700/60 hover:bg-slate-900/60">
             <div className="flex h-20 w-36 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-800/60">
-                {video.video_path && video.status === 'completed' ? (
+                {(liveStatus.video_path ?? video.video_path) && liveStatus.status === 'completed' ? (
                     <video
-                        src={`/storage/${video.video_path}`}
+                        src={`/storage/${liveStatus.video_path ?? video.video_path}`}
+                        className="h-full w-full object-cover"
+                        muted
+                        preload="metadata"
+                    />
+                ) : liveStatus.videoUrl && liveStatus.status === 'completed' ? (
+                    <video
+                        src={liveStatus.videoUrl}
                         className="h-full w-full object-cover"
                         muted
                         preload="metadata"
@@ -55,9 +65,9 @@ export default function VideoListItem({ video }: VideoListItemProps) {
                         {video.title ?? 'Untitled Video'}
                     </h3>
                     <VideoStatusBadge
-                        status={video.status}
-                        label={video.status_label}
-                        color={video.status_color}
+                        status={liveStatus.status}
+                        label={liveStatus.status_label}
+                        color={liveStatus.status_color}
                     />
                 </div>
 

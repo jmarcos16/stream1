@@ -1,8 +1,8 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { Film, Plus, VideoOff } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { VideoOff } from 'lucide-react';
 import Pagination from '@/components/pagination';
+import CreateVideoModal from '@/components/create-video-modal';
 import VideoListItem from '@/components/video-list-item';
-import { Button } from '@/components/ui/button';
 import {
     Select,
     SelectContent,
@@ -50,12 +50,7 @@ export default function VideosIndex({ videos, filters }: VideosIndexProps) {
                             {videos.total} {videos.total === 1 ? 'video' : 'videos'}
                         </p>
                     </div>
-                    <Link href="/video-creator">
-                        <Button className="gap-2 bg-blue-600 text-white hover:bg-blue-700">
-                            <Plus className="h-4 w-4" />
-                            Create Video
-                        </Button>
-                    </Link>
+                    <CreateVideoModal />
                 </div>
 
                 <div className="mb-6">
@@ -94,12 +89,9 @@ export default function VideosIndex({ videos, filters }: VideosIndexProps) {
                                 : 'Create your first video to get started.'}
                         </p>
                         {!filters.status && (
-                            <Link href="/video-creator" className="mt-6">
-                                <Button className="gap-2 bg-blue-600 text-white hover:bg-blue-700">
-                                    <Plus className="h-4 w-4" />
-                                    Create Video
-                                </Button>
-                            </Link>
+                            <div className="mt-6">
+                                <CreateVideoModal />
+                            </div>
                         )}
                     </div>
                 )}
