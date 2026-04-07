@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\VideoEncoder;
 use App\VideoStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -12,7 +13,7 @@ final class Video extends Model
 {
     use HasFactory;
 
-    protected $appends = ['status_label'];
+    protected $appends = ['status_label', 'status_color'];
 
     protected $fillable = [
         'title',
@@ -24,6 +25,7 @@ final class Video extends Model
         'raw_video_path',
         'srt_path',
         'subtitle_style',
+        'encoder',
     ];
 
     /**
@@ -42,7 +44,9 @@ final class Video extends Model
         return match ($status) {
             'processing' => $query->whereIn('status', ['processing', 'pending']),
             'completed' => $query->where('status', 'completed'),
+            'failed' => $query->where('status', 'failed'),
             'drafts' => $query->where('status', 'draft'),
+            'pending' => $query->where('status', 'pending'),
             default => $query,
         };
     }
@@ -59,10 +63,18 @@ final class Video extends Model
         );
     }
 
+    protected function statusColor(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->status->color(),
+        );
+    }
+
     protected function casts(): array
     {
         return [
             'status' => VideoStatus::class,
+            'encoder' => VideoEncoder::class,
         ];
     }
 }

@@ -129,18 +129,17 @@ class BuildVideoJob implements ShouldQueue
             $outputPath = $tempDir.'/clip_'.str_pad((string) $index, 3, '0', STR_PAD_LEFT).'.mp4';
             $effect = $effects[$index % count($effects)];
 
-            $this->runFfmpeg([
-                'ffmpeg', '-y',
-                '-i', $imagePath,
-                '-vf', $this->buildFilterChain($effect),
-                '-c:v', 'libx264',
-                '-preset', 'medium',
-                '-crf', '18',
-                '-pix_fmt', 'yuv420p',
-                '-t', (string) $this->clipDuration,
-                '-an',
-                $outputPath,
-            ]);
+            $encoder = $this->video->encoder;
+            $filterChain = $encoder->appendHwUpload($this->buildFilterChain($effect));
+
+            $this->runFfmpeg(array_merge(
+                ['ffmpeg', '-y'],
+                $encoder->initArgs(),
+                ['-i', $imagePath],
+                ['-vf', $filterChain],
+                $encoder->encoderArgs(),
+                ['-t', (string) $this->clipDuration, '-an', $outputPath],
+            ));
 
             $clips[] = $outputPath;
         }
@@ -191,25 +190,23 @@ class BuildVideoJob implements ShouldQueue
             $inputs[] = $clip;
         }
 
-        $filterComplex = $this->buildXfadeFilterComplex(count($clips));
+        $encoder = $this->video->encoder;
+        $filterComplex = $this->buildXfadeFilterComplex(count($clips), $encoder);
 
         $this->runFfmpeg(array_merge(
             ['ffmpeg', '-y'],
+            $encoder->initArgs(),
             $inputs,
             [
                 '-filter_complex', $filterComplex,
                 '-map', '[final]',
-                '-c:v', 'libx264',
-                '-preset', 'medium',
-                '-crf', '18',
-                '-pix_fmt', 'yuv420p',
-                '-an',
-                $output,
-            ]
+            ],
+            $encoder->encoderArgs(),
+            ['-an', $output],
         ));
     }
 
-    private function buildXfadeFilterComplex(int $clipCount): string
+    private function buildXfadeFilterComplex(int $clipCount, \App\VideoEncoder $encoder): string
     {
         $td = self::TRANSITION_DURATION;
         $cd = $this->clipDuration;
@@ -219,10 +216,18 @@ class BuildVideoJob implements ShouldQueue
         for ($i = 1; $i < $clipCount; $i++) {
             $offset = $i * ($cd - $td);
             $transition = self::TRANSITIONS[($i - 1) % count(self::TRANSITIONS)];
-            $outLabel = $i === $clipCount - 1 ? '[final]' : "[v{$i}]";
+            $isLast = $i === $clipCount - 1;
+            $outLabel = $isLast ? '[prefinal]' : "[v{$i}]";
 
             $parts[] = "{$prevLabel}[{$i}:v]xfade=transition={$transition}:duration={$td}:offset={$offset}{$outLabel}";
             $prevLabel = $outLabel;
+        }
+
+        $hwUpload = $encoder->appendHwUpload('');
+        if ($hwUpload !== '') {
+            $parts[] = '[prefinal]'.ltrim($hwUpload, ',').'[final]';
+        } else {
+            $parts[count($parts) - 1] = str_replace('[prefinal]', '[final]', $parts[count($parts) - 1]);
         }
 
         return implode(';', $parts);

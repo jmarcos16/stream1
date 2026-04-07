@@ -22,6 +22,7 @@ final class VideoGenerationController extends Controller
             'script' => $request->input('script'),
             'status' => VideoStatus::PENDING,
             'subtitle_style' => $request->input('subtitle_style'),
+            'encoder' => $request->input('encoder'),
         ]);
 
         $this->moveImagesToVideoFolder($video, $request->input('images'));

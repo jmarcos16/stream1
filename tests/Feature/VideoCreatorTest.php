@@ -13,10 +13,10 @@ test('video creator page loads successfully', function () {
     );
 });
 
-test('home redirects to video creator', function () {
+test('home redirects to videos index', function () {
     $response = $this->get(route('home'));
 
-    $response->assertRedirect(route('video-creator'));
+    $response->assertRedirect(route('videos.index'));
 });
 
 test('temp media can be uploaded', function () {

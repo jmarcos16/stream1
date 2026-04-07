@@ -31,6 +31,7 @@ export default function VideoCreator() {
         autoSubtitles: true,
         images: [] as string[],
         subtitle_style: 'bottom' as 'bottom' | 'center',
+        encoder: 'cpu' as 'cpu' | 'gpu',
     });
 
     const handleFiles = useCallback(
@@ -140,89 +141,88 @@ export default function VideoCreator() {
             <AppLayout>
                 <div className="w-full flex-1 flex-col gap-8 p-6 md:p-12 text-slate-100 antialiased">
                     <div className="mx-auto w-full max-w-7xl flex flex-col gap-8">
-                        <div className="flex items-center justify-between">
-                            <input
-                                type="text"
-                                value={form.data.title}
-                                onChange={(e) =>
-                                    form.setData('title', e.target.value)
-                                }
-                                className={`w-full border-none bg-transparent text-2xl font-bold outline-none placeholder:text-slate-600 ${form.errors.title ? 'text-red-400' : ''}`}
-                                placeholder="Untitled Project"
-                            />
-                            {form.errors.title && (
-                                <p className="mt-1 text-xs text-red-400">
-                                    {form.errors.title}
-                                </p>
-                            )}
-                            <p className="text-sm text-slate-500">
-                                Transform your ideas into vertical magic
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <button className="rounded-xl border border-slate-800 bg-slate-900 px-5 py-2 text-sm font-medium transition-colors hover:bg-slate-800">
-                                Save Draft
-                            </button>
-                            <div className="relative">
-                                <svg
-                                    className="absolute inset-0 h-full w-full"
-                                    style={{ overflow: 'visible' }}
-                                >
-                                    <defs>
-                                        <linearGradient
-                                            id="gradient-btn"
-                                            x1="0%"
-                                            y1="0%"
-                                            x2="100%"
-                                            y2="0%"
-                                        >
-                                            <stop
-                                                offset="0%"
-                                                stopColor="#5555f6"
-                                            />
-                                            <stop
-                                                offset="50%"
-                                                stopColor="#ec4899"
-                                            />
-                                            <stop
-                                                offset="100%"
-                                                stopColor="#5555f6"
-                                            />
-                                        </linearGradient>
-                                    </defs>
-                                    <rect
-                                        x="1"
-                                        y="1"
-                                        width="calc(100% - 2px)"
-                                        height="calc(100% - 2px)"
-                                        rx="12"
-                                        ry="12"
-                                        fill="none"
-                                        stroke="url(#gradient-btn)"
-                                        strokeWidth="2"
-                                        strokeDasharray="100 300"
-                                        style={{
-                                            animation:
-                                                'rotate-border 3s linear infinite',
-                                        }}
-                                    />
-                                </svg>
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={
-                                        form.processing ||
-                                        images.some((i) => i.uploading) ||
-                                        !images.length
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex-1">
+                                <input
+                                    type="text"
+                                    value={form.data.title}
+                                    onChange={(e) =>
+                                        form.setData('title', e.target.value)
                                     }
-                                    className="relative flex items-center gap-2 rounded-xl bg-gradient-to-br from-[#5555f6] to-[#ec4899] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#5555f6]/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
-                                >
-                                    <span className="material-symbols-outlined text-lg">
-                                        bolt
-                                    </span>
-                                    {form.processing
-                                        ? 'Generating...'
-                                        : 'Generate Video'}
+                                    className={`w-full border-none bg-transparent text-2xl font-bold outline-none placeholder:text-slate-600 ${form.errors.title ? 'text-red-400' : ''}`}
+                                    placeholder="Untitled Project"
+                                />
+                                {form.errors.title && (
+                                    <p className="mt-1 text-xs text-red-400">
+                                        {form.errors.title}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="flex shrink-0 items-center gap-3">
+                                <button className="rounded-xl border border-slate-800 bg-slate-900 px-5 py-2 text-sm font-medium transition-colors hover:bg-slate-800">
+                                    Save Draft
                                 </button>
+                                <div className="relative">
+                                    <svg
+                                        className="absolute inset-0 h-full w-full"
+                                        style={{ overflow: 'visible' }}
+                                    >
+                                        <defs>
+                                            <linearGradient
+                                                id="gradient-btn"
+                                                x1="0%"
+                                                y1="0%"
+                                                x2="100%"
+                                                y2="0%"
+                                            >
+                                                <stop
+                                                    offset="0%"
+                                                    stopColor="#5555f6"
+                                                />
+                                                <stop
+                                                    offset="50%"
+                                                    stopColor="#ec4899"
+                                                />
+                                                <stop
+                                                    offset="100%"
+                                                    stopColor="#5555f6"
+                                                />
+                                            </linearGradient>
+                                        </defs>
+                                        <rect
+                                            x="1"
+                                            y="1"
+                                            width="calc(100% - 2px)"
+                                            height="calc(100% - 2px)"
+                                            rx="12"
+                                            ry="12"
+                                            fill="none"
+                                            stroke="url(#gradient-btn)"
+                                            strokeWidth="2"
+                                            strokeDasharray="100 300"
+                                            style={{
+                                                animation:
+                                                    'rotate-border 3s linear infinite',
+                                            }}
+                                        />
+                                    </svg>
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={
+                                            form.processing ||
+                                            images.some((i) => i.uploading) ||
+                                            !images.length
+                                        }
+                                        className="relative flex items-center gap-2 rounded-xl bg-gradient-to-br from-[#5555f6] to-[#ec4899] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#5555f6]/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
+                                    >
+                                        <span className="material-symbols-outlined text-lg">
+                                            bolt
+                                        </span>
+                                        {form.processing
+                                            ? 'Generating...'
+                                            : 'Generate Video'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -369,6 +369,62 @@ export default function VideoCreator() {
                                                 vertical_align_center
                                             </span>
                                             <span>Center</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </section>
+
+                            {/* Encoder */}
+                            <section className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-xl text-slate-400">
+                                        memory
+                                    </span>
+                                    <h3 className="text-sm font-bold tracking-wider text-slate-400 uppercase">
+                                        Encoder
+                                    </h3>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            form.setData('encoder', 'cpu')
+                                        }
+                                        className={`rounded-xl border bg-slate-900/60 p-4 text-sm font-medium transition-all ${
+                                            form.data.encoder === 'cpu'
+                                                ? 'border-[#5555f6] text-white'
+                                                : 'border-slate-800 text-slate-300 hover:border-[#5555f6]/50'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-center gap-2">
+                                            <span className="material-symbols-outlined">
+                                                memory
+                                            </span>
+                                            <span>CPU (libx264)</span>
+                                            <span className="text-[11px] text-slate-500">
+                                                Slower, universal
+                                            </span>
+                                        </div>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            form.setData('encoder', 'gpu')
+                                        }
+                                        className={`rounded-xl border bg-slate-900/60 p-4 text-sm font-medium transition-all ${
+                                            form.data.encoder === 'gpu'
+                                                ? 'border-[#5555f6] text-white'
+                                                : 'border-slate-800 text-slate-300 hover:border-[#5555f6]/50'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-center gap-2">
+                                            <span className="material-symbols-outlined">
+                                                speed
+                                            </span>
+                                            <span>GPU (AMD VAAPI)</span>
+                                            <span className="text-[11px] text-slate-500">
+                                                Faster, requires AMD GPU
+                                            </span>
                                         </div>
                                     </button>
                                 </div>

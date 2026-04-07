@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\VideoEncoder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
@@ -10,7 +11,7 @@ use function Laravel\Prompts\intro;
 
 class TesteVideoProcessor extends Command
 {
-    protected $signature = 'app:teste {--merge : Merge the latest audio and video files}';
+    protected $signature = 'app:teste {--merge : Merge the latest audio and video files} {--gpu : Use GPU (AMD VAAPI) encoding instead of CPU}';
 
     protected $description = 'Generate short-form video (9:16) from images with Ken Burns effect and transitions';
 
@@ -37,6 +38,9 @@ class TesteVideoProcessor extends Command
     {
         intro('TesteVideoProcessor Command');
 
+        $encoder = $this->option('gpu') ? VideoEncoder::Gpu : VideoEncoder::Cpu;
+        $this->info('Using encoder: '.$encoder->label());
+
         if ($this->option('merge')) {
             $this->mergeLatestAudioVideo();
 
@@ -58,7 +62,7 @@ class TesteVideoProcessor extends Command
         File::ensureDirectoryExists($tempDir);
         File::ensureDirectoryExists($outputDir);
 
-        $clips = $this->buildClips($images, $tempDir);
+        $clips = $this->buildClips($images, $tempDir, $encoder);
 
         if (count($clips) < 2) {
             $finalClip = $clips[0] ?? null;
@@ -66,7 +70,7 @@ class TesteVideoProcessor extends Command
                 File::copy($finalClip, $outputDir.'/raw_video.mp4');
             }
         } else {
-            $this->concatenateWithTransitions($clips, $outputDir.'/raw_video.mp4');
+            $this->concatenateWithTransitions($clips, $outputDir.'/raw_video.mp4', $encoder);
         }
 
         File::deleteDirectory($tempDir);
@@ -119,7 +123,7 @@ class TesteVideoProcessor extends Command
      * @param  list<string>  $images
      * @return list<string>
      */
-    private function buildClips(array $images, string $tempDir): array
+    private function buildClips(array $images, string $tempDir, VideoEncoder $encoder): array
     {
         $clips = [];
         $effects = $this->getKenBurnsEffects();
@@ -130,18 +134,16 @@ class TesteVideoProcessor extends Command
 
             $this->info("Processing image {$index}: ".basename($imagePath));
 
-            $this->runFfmpeg([
-                'ffmpeg', '-y',
-                '-i', $imagePath,
-                '-vf', $this->buildFilterChain($effect),
-                '-c:v', 'libx264',
-                '-preset', 'medium',
-                '-crf', '18',
-                '-pix_fmt', 'yuv420p',
-                '-t', (string) self::CLIP_DURATION,
-                '-an',
-                $outputPath,
-            ]);
+            $filterChain = $encoder->appendHwUpload($this->buildFilterChain($effect));
+
+            $this->runFfmpeg(array_merge(
+                ['ffmpeg', '-y'],
+                $encoder->initArgs(),
+                ['-i', $imagePath],
+                ['-vf', $filterChain],
+                $encoder->encoderArgs(),
+                ['-t', (string) self::CLIP_DURATION, '-an', $outputPath],
+            ));
 
             $clips[] = $outputPath;
             $this->info("Clip {$index} created.");
@@ -190,7 +192,7 @@ class TesteVideoProcessor extends Command
     /**
      * @param  list<string>  $clips
      */
-    private function concatenateWithTransitions(array $clips, string $output): void
+    private function concatenateWithTransitions(array $clips, string $output, VideoEncoder $encoder): void
     {
         $this->info('Concatenating '.count($clips).' clips with transitions...');
 
@@ -200,25 +202,22 @@ class TesteVideoProcessor extends Command
             $inputs[] = $clip;
         }
 
-        $filterComplex = $this->buildXfadeFilterComplex(count($clips));
+        $filterComplex = $this->buildXfadeFilterComplex(count($clips), $encoder);
 
         $this->runFfmpeg(array_merge(
             ['ffmpeg', '-y'],
+            $encoder->initArgs(),
             $inputs,
             [
                 '-filter_complex', $filterComplex,
                 '-map', '[final]',
-                '-c:v', 'libx264',
-                '-preset', 'medium',
-                '-crf', '18',
-                '-pix_fmt', 'yuv420p',
-                '-an',
-                $output,
-            ]
+            ],
+            $encoder->encoderArgs(),
+            ['-an', $output],
         ));
     }
 
-    private function buildXfadeFilterComplex(int $clipCount): string
+    private function buildXfadeFilterComplex(int $clipCount, VideoEncoder $encoder): string
     {
         $td = self::TRANSITION_DURATION;
         $cd = self::CLIP_DURATION;
@@ -228,10 +227,18 @@ class TesteVideoProcessor extends Command
         for ($i = 1; $i < $clipCount; $i++) {
             $offset = $i * ($cd - $td);
             $transition = self::TRANSITIONS[($i - 1) % count(self::TRANSITIONS)];
-            $outLabel = $i === $clipCount - 1 ? '[final]' : "[v{$i}]";
+            $isLast = $i === $clipCount - 1;
+            $outLabel = $isLast ? '[prefinal]' : "[v{$i}]";
 
             $parts[] = "{$prevLabel}[{$i}:v]xfade=transition={$transition}:duration={$td}:offset={$offset}{$outLabel}";
             $prevLabel = $outLabel;
+        }
+
+        $hwUpload = $encoder->appendHwUpload('');
+        if ($hwUpload !== '') {
+            $parts[] = '[prefinal]'.ltrim($hwUpload, ',').'[final]';
+        } else {
+            $parts[count($parts) - 1] = str_replace('[prefinal]', '[final]', $parts[count($parts) - 1]);
         }
 
         return implode(';', $parts);

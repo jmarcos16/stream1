@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Video;
-use App\VideoStatus;
 
 test('video can be created with bottom subtitle style', function () {
     $video = Video::factory()->create([
@@ -31,6 +30,7 @@ test('video generation request validates subtitle style', function () {
         'script' => 'Test script content',
         'images' => ['test.jpg'],
         'subtitle_style' => 'invalid',
+        'encoder' => 'cpu',
     ]);
 
     $response->assertSessionHasErrors('subtitle_style');
@@ -42,6 +42,7 @@ test('video generation request accepts valid subtitle styles', function (string 
         'script' => 'Test script content',
         'images' => ['test.jpg'],
         'subtitle_style' => $style,
+        'encoder' => 'cpu',
     ]);
 
     $response->assertSessionHasNoErrors();
